@@ -1,0 +1,15 @@
+plugins {
+	id 'java-library'
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+	realLogicSbeVersion = '1.32.1'
+}
+
+dependencies {
+	compileOnly "uk.co.real-logic:sbe-all:$realLogicSbeVersion"
+}

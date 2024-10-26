@@ -1,0 +1,53 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.5'
+	id 'io.spring.dependency-management' version '1.1.6'
+}
+
+apply plugin: SbeToolPlugin
+
+group = 'org.cresplanex'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	jacksonVersion = '2.18.0'
+	apacheCommonsVersion = '3.17.0'
+	realLogicSbeVersion = '1.32.1'
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.kafka:spring-kafka'
+	implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion"
+	implementation "org.apache.commons:commons-lang3:$apacheCommonsVersion"
+	implementation "uk.co.real-logic:sbe-all:$realLogicSbeVersion"
+	implementation 'org.postgresql:postgresql'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'org.springframework.retry:spring-retry'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += "$buildDir/generated-sources/sbe"  // 生成されたコードのディレクトリ
+        }
+    }
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
