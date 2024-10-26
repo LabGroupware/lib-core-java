@@ -1,7 +1,6 @@
 package org.cresplanex.core.common.json.mapper;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 
 import org.cresplanex.core.common.id.Int128;
 
@@ -9,8 +8,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -49,10 +46,10 @@ public class Int128Module extends SimpleModule {
       jgen.writeString(value.asString());
     }
 
-    @Override
-    public JsonNode getSchema(SerializerProvider provider, Type typeHint, boolean isOptional) throws JsonMappingException {
-      return createSchemaNode("string", true);
-    }
+    // @Override
+    // public JsonNode getSchema(SerializerProvider provider, Type typeHint) throws JsonMappingException {
+    //   return createSchemaNode("string", true);
+    // }
   }
 
   @Override

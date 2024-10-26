@@ -11,5 +11,5 @@ ext {
 }
 
 dependencies {
-	compileOnly "uk.co.real-logic:sbe-all:$realLogicSbeVersion"
+	implementation "uk.co.real-logic:sbe-all:$realLogicSbeVersion"
 }
