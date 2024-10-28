@@ -22,6 +22,17 @@ MAC_ADDRESSはネットワークインタフェースから取得されるが, �
 CUSTOM_MAC_ADDRESS=73588229205
 ```
 
+参考として, 内部ではこのように変換されている.
+``` java
+    private Long toLong(byte[] bytes) {
+        long result = 0L;
+        for (byte b : bytes) {
+            result = (result << 8) + (b & 0xff);
+        }
+        return result;
+    }
+```
+
 #### incrementIdIfPossible
 incrementの際は, 何もせず, generateを行うだけで, IDの枯渇にはならない.
 
@@ -49,18 +60,6 @@ counterは後半64bitのうち, 上位16bitとなり, これがmax値(65535)と�
 ### 適用方法
 
 [serviceIDのプロパティ](#serviceid)を設定することで, `DatabaseIdGenerator`が適用される.設定しない場合は, `ApplicationIdGenerator`が適用され, 自動生成される.
-
-
-参考として, 内部ではこのように変換されている.
-``` java
-    private Long toLong(byte[] bytes) {
-        long result = 0L;
-        for (byte b : bytes) {
-            result = (result << 8) + (b & 0xff);
-        }
-        return result;
-    }
-```
 
 ## Schema
 
