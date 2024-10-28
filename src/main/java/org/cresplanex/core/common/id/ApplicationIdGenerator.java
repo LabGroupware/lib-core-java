@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class ApplicationIdGenerator implements IdGenerator {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
-    private static final long MAX_COUNTER = 1 << 16;
+    private static final long MAX_COUNTER = 1 << 16; // 最大値は65536
 
     private Long macAddress;
     private long currentPeriod = timeNow();

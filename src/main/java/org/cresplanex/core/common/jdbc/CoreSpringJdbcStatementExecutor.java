@@ -13,15 +13,42 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+/**
+ * Springの {@link JdbcTemplate} を使用してJDBCステートメントを実行するクラス。
+ * <p>
+ * SQLクエリの実行、データ挿入時の生成ID取得、更新、リスト形式でのクエリ取得などの機能を提供します。
+ * </p>
+ */
 public class CoreSpringJdbcStatementExecutor implements CoreJdbcStatementExecutor {
 
+    /**
+     * JDBC操作に使用する {@link JdbcTemplate} のインスタンス
+     */
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * ログを出力するためのロガー
+     */
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    /**
+     * {@link CoreSpringJdbcStatementExecutor} のコンストラクタ。
+     *
+     * @param jdbcTemplate SpringのJdbcTemplateインスタンス
+     */
     public CoreSpringJdbcStatementExecutor(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    /**
+     * データを挿入し、生成されたIDを返します。
+     *
+     * @param sql 実行するSQLクエリ
+     * @param idColumn 生成されたIDのカラム名
+     * @param params クエリに渡すパラメータ
+     * @return 生成されたIDの値
+     * @throws CoreDuplicateKeyException 重複キーが発生した場合
+     */
     @Override
     public long insertAndReturnGeneratedId(String sql, String idColumn, Object... params) {
         if (logger.isDebugEnabled()) {
@@ -46,8 +73,6 @@ public class CoreSpringJdbcStatementExecutor implements CoreJdbcStatementExecuto
             }
 
             if (keys.size() > 1) {
-                // necessary for postgres. For postgres holder returns all columns.
-                // return (Long) holder.getKeys().get(idColumn);
                 if (keys.containsKey(idColumn)) {
                     return (Long) keys.get(idColumn);
                 } else {
@@ -66,6 +91,14 @@ public class CoreSpringJdbcStatementExecutor implements CoreJdbcStatementExecuto
         }
     }
 
+    /**
+     * データを更新します。
+     *
+     * @param sql 実行するSQLクエリ
+     * @param params クエリに渡すパラメータ
+     * @return 更新された行数
+     * @throws CoreDuplicateKeyException 重複キーが発生した場合
+     */
     @Override
     public int update(String sql, Object... params) {
         try {
@@ -75,11 +108,27 @@ public class CoreSpringJdbcStatementExecutor implements CoreJdbcStatementExecuto
         }
     }
 
+    /**
+     * クエリを実行してリストを取得します。
+     *
+     * @param <T> クエリ結果の型
+     * @param sql 実行するSQLクエリ
+     * @param coreRowMapper 結果をマッピングするローマッパー
+     * @param params クエリに渡すパラメータ
+     * @return クエリ結果のリスト
+     */
     @Override
     public <T> List<T> query(String sql, CoreRowMapper<T> coreRowMapper, Object... params) {
         return jdbcTemplate.query(sql, coreRowMapper::mapRow, params);
     }
 
+    /**
+     * クエリを実行してマップ形式でリストを取得します。
+     *
+     * @param sql 実行するSQLクエリ
+     * @param parameters クエリに渡すパラメータ
+     * @return クエリ結果のリスト（各行をマップ形式で保持）
+     */
     @Override
     public List<Map<String, Object>> queryForList(String sql, Object... parameters) {
         return jdbcTemplate.queryForList(sql, parameters);

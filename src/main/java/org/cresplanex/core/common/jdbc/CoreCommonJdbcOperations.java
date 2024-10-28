@@ -10,6 +10,13 @@ import static org.cresplanex.core.common.jdbc.CoreJdbcOperationsUtils.MESSAGE_AU
 import org.cresplanex.core.common.jdbc.sqldialect.CoreSqlDialect;
 import org.cresplanex.core.common.json.mapper.JSonMapper;
 
+/**
+ * JDBCを使用してイベントおよびメッセージの挿入操作を行うユーティリティクラス。
+ * <p>
+ * アウトボックスメッセージとイベントのテーブルにデータを挿入する機能を提供します。各種挿入操作に対して、アプリケーションまたは
+ * データベースが生成するIDをサポートしています。
+ * </p>
+ */
 public class CoreCommonJdbcOperations {
 
     private final CoreJdbcOperationsUtils coreJdbcOperationsUtils;
@@ -17,6 +24,14 @@ public class CoreCommonJdbcOperations {
     private final OutboxPartitioningSpec outboxPartitioningSpec;
     private final CoreSqlDialect coreSqlDialect;
 
+    /**
+     * コンストラクタ。指定されたコンポーネントでインスタンスを構築します。
+     *
+     * @param coreJdbcOperationsUtils JDBC操作ユーティリティ
+     * @param coreJdbcStatementExecutor ステートメント実行オブジェクト
+     * @param coreSqlDialect SQL方言
+     * @param outboxPartitioningSpec アウトボックスパーティショニング仕様
+     */
     public CoreCommonJdbcOperations(CoreJdbcOperationsUtils coreJdbcOperationsUtils,
             CoreJdbcStatementExecutor coreJdbcStatementExecutor,
             CoreSqlDialect coreSqlDialect,
@@ -27,10 +42,28 @@ public class CoreCommonJdbcOperations {
         this.outboxPartitioningSpec = outboxPartitioningSpec;
     }
 
+    /**
+     * 現在のSQLデータベースMSを取得します。
+     *
+     * @return 現在の {@link CoreSqlDialect} インスタンス
+     */
     public CoreSqlDialect getCoreSqlDialect() {
         return coreSqlDialect;
     }
 
+    /**
+     * イベントテーブルにデータを挿入するSQLを生成します。
+     *
+     * @param idGenerator ID生成オブジェクト
+     * @param entityId エンティティID
+     * @param eventData イベントデータ
+     * @param eventType イベントタイプ
+     * @param entityType エンティティタイプ
+     * @param triggeringEvent トリガーとなるイベント
+     * @param metadata メタデータ
+     * @param coreSchema 使用するスキーマ
+     * @return 生成されたイベントID
+     */
     public String insertIntoEventsTable(IdGenerator idGenerator,
             String entityId,
             String eventData,
@@ -44,6 +77,19 @@ public class CoreCommonJdbcOperations {
                 entityId, eventData, eventType, entityType, triggeringEvent, metadata, coreSchema, false);
     }
 
+    /**
+     * 発行済みのイベントをイベントテーブルに挿入します。
+     *
+     * @param idGenerator ID生成オブジェクト
+     * @param entityId エンティティID
+     * @param eventData イベントデータ
+     * @param eventType イベントタイプ
+     * @param entityType エンティティタイプ
+     * @param triggeringEvent トリガーとなるイベント
+     * @param metadata メタデータ
+     * @param coreSchema 使用するスキーマ
+     * @return 生成されたイベントID
+     */
     public String insertPublishedEventIntoEventsTable(IdGenerator idGenerator,
             String entityId,
             String eventData,
@@ -57,6 +103,20 @@ public class CoreCommonJdbcOperations {
                 entityId, eventData, eventType, entityType, triggeringEvent, metadata, coreSchema, true);
     }
 
+    /**
+     * イベントテーブルにデータを挿入します。
+     *
+     * @param idGenerator ID生成オブジェクト
+     * @param entityId エンティティID
+     * @param eventData イベントデータ
+     * @param eventType イベントタイプ
+     * @param entityType エンティティタイプ
+     * @param triggeringEvent トリガーとなるイベント
+     * @param metadata メタデータ
+     * @param coreSchema 使用するスキーマ
+     * @param published イベントが発行済みかどうか
+     * @return
+     */
     private String insertIntoEventsTable(IdGenerator idGenerator,
             String entityId,
             String eventData,
@@ -98,6 +158,16 @@ public class CoreCommonJdbcOperations {
         }
     }
 
+    /**
+     * アウトボックスメッセージテーブルにデータを挿入します。
+     *
+     * @param idGenerator ID生成オブジェクト
+     * @param payload メッセージのペイロード
+     * @param destination メッセージの宛先
+     * @param headers メッセージヘッダー
+     * @param coreSchema 使用するスキーマ
+     * @return 生成されたメッセージID
+     */
     public String insertIntoMessageTable(IdGenerator idGenerator,
             String payload,
             String destination,
@@ -107,6 +177,16 @@ public class CoreCommonJdbcOperations {
         return insertIntoMessageTable(idGenerator, payload, destination, headers, coreSchema, false);
     }
 
+    /**
+     * 発行済みのメッセージをアウトボックスメッセージテーブルに挿入します。
+     *
+     * @param idGenerator ID生成オブジェクト
+     * @param payload メッセージのペイロード
+     * @param destination メッセージの宛先
+     * @param headers メッセージヘッダー
+     * @param coreSchema 使用するスキーマ
+     * @return 生成されたメッセージID
+     */
     public String insertPublishedMessageIntoMessageTable(IdGenerator idGenerator,
             String payload,
             String destination,
@@ -116,6 +196,17 @@ public class CoreCommonJdbcOperations {
         return insertIntoMessageTable(idGenerator, payload, destination, headers, coreSchema, true);
     }
 
+    /**
+     * アウトボックスメッセージテーブルにデータを挿入します。
+     *
+     * @param idGenerator ID生成オブジェクト
+     * @param payload メッセージのペイロード
+     * @param destination メッセージの宛先
+     * @param headers メッセージヘッダー
+     * @param coreSchema 使用するスキーマ
+     * @param published メッセージが発行済みかどうか
+     * @return 生成されたメッセージID
+     */
     private String insertIntoMessageTable(IdGenerator idGenerator,
             String payload,
             String destination,
@@ -133,6 +224,18 @@ public class CoreCommonJdbcOperations {
         }
     }
 
+    /**
+     * アウトボックスメッセージテーブルにデータを挿入します。
+     *
+     * @param idGenerator ID生成オブジェクト
+     * @param payload メッセージのペイロード
+     * @param destination メッセージの宛先
+     * @param headers メッセージヘッダー
+     * @param published メッセージが発行済みかどうか
+     * @param coreSchema 使用するスキーマ
+     * @param outboxPartitionValues アウトボックスパーティション値
+     * @return 生成されたメッセージID
+     */
     private String insertIntoMessageTableApplicationId(IdGenerator idGenerator,
             String payload,
             String destination,
@@ -156,12 +259,30 @@ public class CoreCommonJdbcOperations {
         return messageId;
     }
 
+    /**
+     * ヘッダーがIDを持たないことを検証します。
+     *
+     * @param headers メッセージヘッダー
+     * @throws RuntimeException すでにIDが設定されている場合
+     */
     private void verifyNoID(Map<String, String> headers) {
         if (headers.containsKey("ID")) {
             throw new RuntimeException("ID should not be already set");
         }
     }
 
+    /**
+     * アウトボックスメッセージテーブルにデータを挿入します。
+     *
+     * @param idGenerator ID生成オブジェクト
+     * @param payload メッセージのペイロード
+     * @param destination メッセージの宛先
+     * @param headers メッセージヘッダー
+     * @param published メッセージが発行済みかどうか
+     * @param coreSchema 使用するスキーマ
+     * @param outboxPartitionValues アウトボックスパーティション値
+     * @return 生成されたメッセージID
+     */
     private String insertIntoMessageTableDatabaseId(IdGenerator idGenerator,
             String payload,
             String destination,
@@ -179,6 +300,13 @@ public class CoreCommonJdbcOperations {
         return idGenerator.genId(databaseId, outboxPartitionValues.outboxTableSuffix.suffix).asString();
     }
 
+    /**
+     * SQL列をJSON形式に変換するためのメソッド。
+     *
+     * @param coreSchema 使用するスキーマ
+     * @param column 変換対象のカラム名
+     * @return JSON形式の列を含むSQL文字列
+     */
     protected String columnToJson(CoreSchema coreSchema, String column) {
         return getCoreSqlDialect().castToJson(
                 "?",

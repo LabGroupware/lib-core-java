@@ -1,8 +1,8 @@
 package org.cresplanex.core.common.jdbc.sqldialect;
 
-import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.HashSet;
+import static java.util.Arrays.asList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,10 +13,19 @@ import org.cresplanex.core.common.jdbc.CoreJdbcStatementExecutor;
 import org.cresplanex.core.common.jdbc.CoreSchema;
 import org.postgresql.util.PGobject;
 
+/**
+ * PostgreSQL用のSQL方言クラス。
+ * <p>
+ * PostgreSQLのドライバとデータベース名に対応し、JSONのキャスト、IDの取得、およびカラムタイプのキャッシュ機能を提供します。
+ * </p>
+ */
 public class PostgresDialect extends AbstractCoreSqlDialect {
 
     private final ConcurrentMap<ColumnCacheKey, String> columnTypeCache = new ConcurrentHashMap<>();
 
+    /**
+     * コンストラクタ。PostgreSQL用の設定を行います。
+     */
     public PostgresDialect() {
         super(Collections.singleton("org.postgresql.Driver"),
                 Collections.unmodifiableSet(new HashSet<>(asList("postgres", "postgresql", "pgsql", "pg"))),
@@ -57,16 +66,24 @@ public class PostgresDialect extends AbstractCoreSqlDialect {
                 return pGobject.getValue();
             }
 
-            throw new IllegalArgumentException(String.format("Unsupported postgres type %s of column %s", pGobject.getType(), column));
+            throw new IllegalArgumentException(String.format("Unsupported Postgres type: %s Column: %s", pGobject.getType(), column));
         }
 
         if (object == null) {
-            throw new IllegalArgumentException(String.format("Object is null for column %s", column));
+            throw new IllegalArgumentException(String.format("Column %s object is null", column));
         }
-        throw new IllegalArgumentException(String.format("Unsupported java type %s for column %s", object.getClass(), column));
-        // throw new IllegalArgumentException(String.format("Unsupported java type %s for column %s", object.getClass(), column));
+        throw new IllegalArgumentException(String.format("Unsupported Java type %s Column: %s", object.getClass(), column));
     }
 
+    /**
+     * 指定されたカラムのデータ型を取得します。カラムのデータ型はキャッシュされ、再利用されます。
+     *
+     * @param coreSchema スキーマ情報
+     * @param unqualifiedTable テーブル名
+     * @param column カラム名
+     * @param selectCallback SQL選択コールバック
+     * @return カラムのデータ型
+     */
     public String getColumnType(CoreSchema coreSchema,
             String unqualifiedTable,
             String column,
@@ -83,7 +100,7 @@ public class PostgresDialect extends AbstractCoreSqlDialect {
                     List<Object> queryArgs = asList(coreSchema.isEmpty() ? "public" : coreSchema.getCoreDatabaseSchema(), unqualifiedTable, column);
                     List<Map<String, Object>> results = selectCallback.apply(sql, queryArgs);
                     if (results.isEmpty()) {
-                        throw new RuntimeException("Could not retrieve metadata for " + queryArgs);
+                        throw new RuntimeException("Cannot get metadata: " + queryArgs);
                     }
                     return (String) results.get(0).get("data_type");
                 });
