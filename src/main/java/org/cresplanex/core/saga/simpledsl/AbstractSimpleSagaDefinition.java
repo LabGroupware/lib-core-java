@@ -1,18 +1,16 @@
 package org.cresplanex.core.saga.simpledsl;
 
-import io.eventuate.common.json.mapper.JSonMapper;
-import io.eventuate.tram.commands.common.ReplyMessageHeaders;
-import io.eventuate.tram.messaging.common.Message;
+import java.util.List;
+import java.util.function.BiFunction;
+
+import org.cresplanex.core.commands.common.ReplyMessageHeaders;
+import org.cresplanex.core.common.json.mapper.JSonMapper;
+import org.cresplanex.core.messaging.common.Message;
 import org.cresplanex.core.saga.orchestration.SagaActions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.function.BiFunction;
-
-public abstract class AbstractSimpleSagaDefinition<Data, Step extends ISagaStep<Data>,
-        ToExecute extends AbstractStepToExecute<Data, Step>,
-        Provider extends AbstractSagaActionsProvider<Data,?>> {
+public abstract class AbstractSimpleSagaDefinition<Data, Step extends ISagaStep<Data>, ToExecute extends AbstractStepToExecute<Data, Step>, Provider extends AbstractSagaActionsProvider<Data, ?>> {
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -37,7 +35,7 @@ public abstract class AbstractSimpleSagaDefinition<Data, Step extends ISagaStep<
     }
 
     protected Provider sagaActionsForNextStep(String sagaType, String sagaId, Data sagaData, Message message,
-                                              SagaExecutionState state, Step currentStep, boolean compensating) {
+            SagaExecutionState state, Step currentStep, boolean compensating) {
         if (currentStep.isSuccessfulReply(compensating, message)) {
             return nextStepToExecute(state, sagaData);
         } else if (compensating) {
@@ -56,8 +54,9 @@ public abstract class AbstractSimpleSagaDefinition<Data, Step extends ISagaStep<
             if ((compensating ? step.hasCompensation(data) : step.hasAction(data))) {
                 ToExecute stepToExecute = makeStepToExecute(skipped, compensating, step);
                 return makeSagaActionsProvider(stepToExecute, data, state);
-            } else
+            } else {
                 skipped++;
+            }
         }
         return makeSagaActionsProvider(makeEndStateSagaActions(state));
     }
@@ -88,6 +87,5 @@ public abstract class AbstractSimpleSagaDefinition<Data, Step extends ISagaStep<
     protected abstract Provider makeSagaActionsProvider(SagaActions<Data> sagaActions);
 
     protected abstract Provider makeSagaActionsProvider(ToExecute stepToExecute, Data data, SagaExecutionState state);
-
 
 }

@@ -1,14 +1,13 @@
 package org.cresplanex.core.saga.simpledsl;
 
-import io.eventuate.tram.commands.common.CommandReplyOutcome;
-import io.eventuate.tram.commands.common.ReplyMessageHeaders;
-import io.eventuate.tram.messaging.common.Message;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import org.cresplanex.core.commands.common.CommandReplyOutcome;
+import org.cresplanex.core.commands.common.ReplyMessageHeaders;
+import org.cresplanex.core.messaging.common.Message;
 import static org.cresplanex.core.saga.simpledsl.StepOutcome.makeLocalOutcome;
 
 public class LocalStep<Data> implements SagaStep<Data> {

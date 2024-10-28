@@ -1,10 +1,10 @@
 package org.cresplanex.core.saga.simpledsl;
 
-import io.eventuate.tram.commands.common.Command;
-import io.eventuate.tram.commands.consumer.CommandWithDestination;
-
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import org.cresplanex.core.commands.common.Command;
+import org.cresplanex.core.commands.consumer.CommandWithDestination;
 
 public interface WithCompensationBuilder<Data> {
 

@@ -1,12 +1,11 @@
 package org.cresplanex.core.saga.simpledsl;
 
-import io.eventuate.tram.messaging.common.Message;
+import java.util.List;
+import static java.util.function.Function.identity;
+
+import org.cresplanex.core.messaging.common.Message;
 import org.cresplanex.core.saga.orchestration.SagaActions;
 import org.cresplanex.core.saga.orchestration.SagaDefinition;
-
-import java.util.List;
-
-import static java.util.function.Function.identity;
 
 public class SimpleSagaDefinition<Data>
         extends AbstractSimpleSagaDefinition<Data, SagaStep<Data>, StepToExecute<Data>, SagaActionsProvider<Data>>

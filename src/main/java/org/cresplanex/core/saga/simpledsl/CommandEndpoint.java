@@ -1,16 +1,16 @@
 package org.cresplanex.core.saga.simpledsl;
 
-import io.eventuate.tram.commands.common.Command;
-
 import java.util.Set;
+
+import org.cresplanex.core.commands.common.Command;
 
 public class CommandEndpoint<C extends Command> {
 
-  private String commandChannel;
-  private Class<C> commandClass;
-  private Set<Class> replyClasses;
+  private final String commandChannel;
+  private final Class<C> commandClass;
+  private final Set<Class<?>> replyClasses;
 
-  public CommandEndpoint(String commandChannel, Class<C> commandClass, Set<Class> replyClasses) {
+  public CommandEndpoint(String commandChannel, Class<C> commandClass, Set<Class<?>> replyClasses) {
     this.commandChannel = commandChannel;
     this.commandClass = commandClass;
     this.replyClasses = replyClasses;
@@ -24,7 +24,7 @@ public class CommandEndpoint<C extends Command> {
     return commandClass;
   }
 
-  public Set<Class> getReplyClasses() {
+  public Set<Class<?>> getReplyClasses() {
     return replyClasses;
   }
 }

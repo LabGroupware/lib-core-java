@@ -1,8 +1,8 @@
 package org.cresplanex.core.saga.simpledsl;
 
-import io.eventuate.tram.commands.common.Command;
-
 import java.util.Map;
+
+import org.cresplanex.core.commands.common.Command;
 
 public class ParticipantParamsAndCommand<C extends Command> {
   private final Map<String, String> params;

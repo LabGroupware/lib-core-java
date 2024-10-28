@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 
 public abstract class AbstractParticipantInvocation<Data> implements ParticipantInvocation<Data> {
 
-  private Optional<Predicate<Data>> invocablePredicate;
+  private final Optional<Predicate<Data>> invocablePredicate;
 
   protected AbstractParticipantInvocation(Optional<Predicate<Data>> invocablePredicate) {
     this.invocablePredicate = invocablePredicate;

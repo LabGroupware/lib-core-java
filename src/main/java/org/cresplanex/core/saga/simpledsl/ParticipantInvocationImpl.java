@@ -1,15 +1,15 @@
 package org.cresplanex.core.saga.simpledsl;
 
-import io.eventuate.tram.commands.common.Command;
-import io.eventuate.tram.commands.common.CommandReplyOutcome;
-import io.eventuate.tram.commands.common.ReplyMessageHeaders;
-import io.eventuate.tram.commands.consumer.CommandWithDestination;
-import io.eventuate.tram.messaging.common.Message;
-import org.cresplanex.core.saga.orchestration.CommandWithDestinationAndType;
-
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import org.cresplanex.core.commands.common.Command;
+import org.cresplanex.core.commands.common.CommandReplyOutcome;
+import org.cresplanex.core.commands.common.ReplyMessageHeaders;
+import org.cresplanex.core.commands.consumer.CommandWithDestination;
+import org.cresplanex.core.messaging.common.Message;
+import org.cresplanex.core.saga.orchestration.CommandWithDestinationAndType;
 
 public class ParticipantInvocationImpl<Data, C extends Command> extends AbstractParticipantInvocation<Data> {
   private final boolean notification;

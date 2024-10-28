@@ -1,13 +1,12 @@
 package org.cresplanex.core.saga.simpledsl;
 
-import io.eventuate.tram.commands.common.Command;
-
+import static java.util.Collections.singletonMap;
 import java.util.Map;
 
-import static java.util.Collections.singletonMap;
+import org.cresplanex.core.commands.common.Command;
 
 public class ParticipantInvocationBuilder {
-  private Map<String, String> params;
+  private final Map<String, String> params;
 
 
   public ParticipantInvocationBuilder(String key, String value) {

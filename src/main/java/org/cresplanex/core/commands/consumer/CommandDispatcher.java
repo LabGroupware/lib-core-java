@@ -88,7 +88,7 @@ public class CommandDispatcher {
 
     // protected List<Message> invoke(CommandHandler commandHandler, CommandMessage cm, Map<String, String> pathVars, CommandReplyToken commandReplyToken) {
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected List<Message> invoke(CommandHandler commandHandler, CommandMessage<Object> cm, Map<String, String> pathVars, CommandReplyToken commandReplyToken) {
+    protected List<Message> invoke(CommandHandler commandHandler, CommandMessage<?> cm, Map<String, String> pathVars, CommandReplyToken commandReplyToken) {
         return commandHandler.invokeMethod(new CommandHandlerArgs(cm, new PathVariables(pathVars), commandReplyToken));
     }
 

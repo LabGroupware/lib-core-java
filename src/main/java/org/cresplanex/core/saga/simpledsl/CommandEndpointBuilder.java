@@ -1,15 +1,15 @@
 package org.cresplanex.core.saga.simpledsl;
 
-import io.eventuate.tram.commands.common.Command;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.cresplanex.core.commands.common.Command;
 
 public class CommandEndpointBuilder<C extends Command> {
 
   private String channel;
-  private Class<C> commandClass;
-  private Set<Class> replyClasses = new HashSet<>();
+  private final Class<C> commandClass;
+  private final Set<Class<?>> replyClasses = new HashSet<>();
 
   public CommandEndpointBuilder(Class<C> commandClass) {
     this.commandClass = commandClass;

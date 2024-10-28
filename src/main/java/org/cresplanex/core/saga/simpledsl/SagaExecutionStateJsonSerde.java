@@ -1,6 +1,6 @@
 package org.cresplanex.core.saga.simpledsl;
 
-import io.eventuate.common.json.mapper.JSonMapper;
+import org.cresplanex.core.common.json.mapper.JSonMapper;
 
 public class SagaExecutionStateJsonSerde {
   public static SagaExecutionState decodeState(String currentState) {

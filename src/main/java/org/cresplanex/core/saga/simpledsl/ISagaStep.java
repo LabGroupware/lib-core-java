@@ -1,6 +1,6 @@
 package org.cresplanex.core.saga.simpledsl;
 
-import io.eventuate.tram.messaging.common.Message;
+import org.cresplanex.core.messaging.common.Message;
 
 public interface ISagaStep<Data> {
     boolean isSuccessfulReply(boolean compensating, Message message);
