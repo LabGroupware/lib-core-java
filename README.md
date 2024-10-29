@@ -127,6 +127,7 @@ MessageConsumerKafkaImpl: 複数のKafkaメッセージを管理し, 指定さ�
     -> TopicPartitionToSwimlaneMapping: パーティションを基に, メッセージ処理のスイムレーンIDを割り当てるインターフェース. -> SwimlanePerTopicPartition(パーティションごとに個別のスイムレーン), OriginalTopicPartitionToSwimlaneMapping(パーティションIDをそのままスイムレーンとして使用(Default)), MultipleSwimlanesPerTopicPartitionMapping(パーティションごとに複数のスイムレーンをマッピング)
     -> SwimlaneDispatcher: スイムレーンに基づいてメッセージをキューに蓄積し, 順次処理するディスパッチャ.ただし, 実際の処理内容は, MessageConsumerKafkaImpl内のhandleで定義している.また, この中でもRawKafkaMessageからKafkaMessageに変換されたあと, KafkaMessageHandler, ReactiveKafkaMessageHandlerが呼ばれている.
 -> KafkaSubscription: CoreKafkaConsumerの生成後, これのサブスクリプションを解除できるように, コールバックを設定したKafkaSubscriptionを返す.
+-> CoreKafkaMultiMessageConverter: マルチメッセージに関するメッセージの組み立てなどを行う.
 
 CommonMessageConsumer: 複数のKafkaメッセージを管理し、 指定されたハンドラーでメッセージを処理. -> MessageConsumerKafkaImpl
 ```
