@@ -2,8 +2,21 @@ package org.cresplanex.core.messaging.kafka.basic.consumer;
 
 import java.util.Properties;
 
+/**
+ * Kafkaコンシューマのプロパティを生成するファクトリークラス。
+ * <p>
+ * Kafkaの接続に必要な基本設定を提供します。
+ * </p>
+ */
 public class ConsumerPropertiesFactory {
 
+    /**
+     * デフォルトのKafkaコンシューマ設定を生成します。
+     *
+     * @param bootstrapServers Kafkaのブートストラップサーバーのアドレス
+     * @param subscriberId     サブスクライバーID
+     * @return 生成されたプロパティオブジェクト
+     */
     public static Properties makeDefaultConsumerProperties(String bootstrapServers, String subscriberId) {
         Properties consumerProperties = new Properties();
         consumerProperties.put("bootstrap.servers", bootstrapServers);

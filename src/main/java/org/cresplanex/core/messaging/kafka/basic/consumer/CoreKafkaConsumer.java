@@ -19,26 +19,50 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A Kafka consumer that manually commits offsets and supports asynchronous
- * message processing
+ * Kafkaコンシューマーの実装クラス。
+ * <p>
+ * 手動でのオフセットコミットをサポートし、非同期のメッセージ処理を行います。
+ * </p>
  */
 public class CoreKafkaConsumer {
 
-    private static final Logger logger = LoggerFactory.getLogger(CoreKafkaConsumer.class);
+   private static final Logger logger = LoggerFactory.getLogger(CoreKafkaConsumer.class);
+
+    /** サブスクライバーID */
     private final String subscriberId;
+
+    /** メッセージハンドラ */
     private final CoreKafkaConsumerMessageHandler handler;
+
+    /** トピックリスト */
     private final List<String> topics;
+
+    /** Kafkaコンシューマーを生成するファクトリ */
     private final KafkaConsumerFactory kafkaConsumerFactory;
+
+    /** バックプレッシャー設定 */
     private final BackPressureConfig backPressureConfig;
-    // private final long pollTimeout;
+
     private final AtomicBoolean stopFlag = new AtomicBoolean(false);
     private final Properties consumerProperties;
+
+    /** コンシューマーの状態 */
     private volatile CoreKafkaConsumerState state = CoreKafkaConsumerState.CREATED;
 
     private volatile boolean closeConsumerOnStop = true;
 
     private Optional<ConsumerCallbacks> consumerCallbacks = Optional.empty();
 
+    /**
+     * CoreKafkaConsumerのコンストラクタ。
+     *
+     * @param subscriberId サブスクライバーID
+     * @param handler      メッセージハンドラ
+     * @param topics       購読するトピックリスト
+     * @param bootstrapServers Kafkaのブートストラップサーバーアドレス
+     * @param coreKafkaConsumerConfigurationProperties コンシューマーの設定プロパティ
+     * @param kafkaConsumerFactory Kafkaコンシューマーを生成するファクトリ
+     */
     public CoreKafkaConsumer(String subscriberId,
             CoreKafkaConsumerMessageHandler handler,
             List<String> topics,
@@ -53,7 +77,6 @@ public class CoreKafkaConsumer {
         this.consumerProperties = ConsumerPropertiesFactory.makeDefaultConsumerProperties(bootstrapServers, subscriberId);
         this.consumerProperties.putAll(coreKafkaConsumerConfigurationProperties.getProperties());
         this.backPressureConfig = coreKafkaConsumerConfigurationProperties.getBackPressure();
-        // this.pollTimeout = coreKafkaConsumerConfigurationProperties.getPollTimeout();
     }
 
     public void setConsumerCallbacks(Optional<ConsumerCallbacks> consumerCallbacks) {
@@ -68,6 +91,13 @@ public class CoreKafkaConsumer {
         this.closeConsumerOnStop = closeConsumerOnStop;
     }
 
+    /**
+     * トピックの存在を確認するメソッド。
+     *
+     * @param consumer Kafkaコンシューマー
+     * @param topic    確認するトピック名
+     * @return トピックのパーティション情報リスト
+     */
     public static List<PartitionInfo> verifyTopicExistsBeforeSubscribing(KafkaMessageConsumer consumer, String topic) {
         try {
             logger.debug("Verifying Topic {}", topic);
@@ -80,6 +110,12 @@ public class CoreKafkaConsumer {
         }
     }
 
+     /**
+     * オフセットをコミットするメソッド。
+     *
+     * @param consumer  Kafkaコンシューマー
+     * @param processor メッセージプロセッサ
+     */
     private void maybeCommitOffsets(KafkaMessageConsumer consumer, KafkaMessageProcessor processor) {
         Map<TopicPartition, OffsetAndMetadata> offsetsToCommit = processor.offsetsToCommit();
         if (!offsetsToCommit.isEmpty()) {
@@ -92,6 +128,9 @@ public class CoreKafkaConsumer {
         }
     }
 
+    /**
+     * コンシューマの動作を開始するメソッド。
+     */
     public void start() {
         try {
             KafkaMessageConsumer consumer = kafkaConsumerFactory.makeConsumer(subscriberId, consumerProperties);
@@ -143,12 +182,24 @@ public class CoreKafkaConsumer {
         }
     }
 
+     /**
+     * 指定したコンシューマを使ってトピックにサブスクライブする。
+     *
+     * @param consumer Kafkaコンシューマー
+     */
     private void subscribe(KafkaMessageConsumer consumer) {
         logger.debug("Subscribing to {} {}", subscriberId, topics);
         consumer.subscribe(topics);
         logger.debug("Subscribed to {} {}", subscriberId, topics);
     }
 
+    /**
+     * コンシューマのポーリングループを実行する。
+     *
+     * @param consumer          Kafkaコンシューマー
+     * @param processor         メッセージプロセッサ
+     * @param backPressureManager バックプレッシャーマネージャ
+     */
     private void runPollingLoop(KafkaMessageConsumer consumer, KafkaMessageProcessor processor, BackPressureManager backPressureManager) {
         while (!stopFlag.get()) {
             ConsumerRecords<String, byte[]> records = consumer.poll(Duration.of(100, ChronoUnit.MILLIS));
@@ -204,12 +255,20 @@ public class CoreKafkaConsumer {
         }
     }
 
+    /**
+     * コンシューマの動作を停止する。
+     */
     public void stop() {
         stopFlag.set(true);
 //    can't call consumer.close(), it is not thread safe,
 //    it can produce java.util.ConcurrentModificationException: KafkaConsumer is not safe for multi-threaded access
     }
 
+    /**
+     * コンシューマの状態を取得する。
+     *
+     * @return コンシューマの状態
+     */
     public CoreKafkaConsumerState getState() {
         return state;
     }

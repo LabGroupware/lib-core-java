@@ -15,16 +15,37 @@ import org.cresplanex.core.messaging.kafka.common.sbe.MessageHeaderEncoder;
 import org.cresplanex.core.messaging.kafka.common.sbe.MultiMessageDecoder;
 import org.cresplanex.core.messaging.kafka.common.sbe.MultiMessageEncoder;
 
+/**
+ * Kafkaのマルチメッセージをバイナリ配列とオブジェクトに変換するユーティリティクラス。
+ * <p>
+ * メッセージのバイト列をデコードして `CoreKafkaMultiMessages` オブジェクトに変換したり、オブジェクトをバイト配列にエンコードします。
+ * </p>
+ */
 public class CoreKafkaMultiMessageConverter {
 
+     /** メッセージヘッダーとマルチメッセージヘッダーの合計サイズ */
     public static int HEADER_SIZE = MessageHeaderEncoder.ENCODED_LENGTH + MultiMessageEncoder.MessagesEncoder.HEADER_SIZE + MultiMessageEncoder.HeadersEncoder.HEADER_SIZE;
+
+    /** メッセージ識別用のMagic ID */
     public static final String MAGIC_ID = "a8c79db675e14c4cbf1eb77d0d6d0f00"; // generated UUID
     public static final byte[] MAGIC_ID_BYTES = CoreBinaryMessageEncoding.stringToBytes(MAGIC_ID);
 
+    /**
+     * 複数のメッセージをバイト配列に変換します。
+     *
+     * @param coreKafkaMultiMessages 変換対象のメッセージ
+     * @return バイト配列にエンコードされたメッセージ
+     */
     public byte[] convertMessagesToBytes(List<CoreKafkaMultiMessage> coreKafkaMultiMessages) {
         return convertMessagesToBytes(new CoreKafkaMultiMessages(Collections.emptyList(), coreKafkaMultiMessages));
     }
 
+    /**
+     * 複数のメッセージをバイト配列に変換します。
+     *
+     * @param coreKafkaMultiMessages 変換対象のメッセージ
+     * @return バイト配列にエンコードされたメッセージ
+     */
     public byte[] convertMessagesToBytes(CoreKafkaMultiMessages coreKafkaMultiMessages) {
 
         MessageBuilder builder = new MessageBuilder();
@@ -38,6 +59,12 @@ public class CoreKafkaMultiMessageConverter {
         return builder.toBinaryArray();
     }
 
+    /**
+     * バイト配列を複数のメッセージに変換します。
+     *
+     * @param bytes 変換対象のバイト配列
+     * @return メッセージにデコードされたオブジェクト
+     */
     public CoreKafkaMultiMessages convertBytesToMessages(byte[] bytes) {
 
         if (!isMultiMessage(bytes)) {
@@ -62,6 +89,12 @@ public class CoreKafkaMultiMessageConverter {
         return new CoreKafkaMultiMessages(headers, messages);
     }
 
+    /**
+     * マルチメッセージのヘッダーをデコードします。
+     * 
+     * @param multiMessageDecoder マルチメッセージデコーダ
+     * @return マルチメッセージのヘッダー
+     */
     private List<CoreKafkaMultiMessagesHeader> decodeCoreKafkaMultiMessagesHeaders(MultiMessageDecoder multiMessageDecoder) {
         MultiMessageDecoder.HeadersDecoder headersDecoder = multiMessageDecoder.headers();
         List<CoreKafkaMultiMessagesHeader> headers = new ArrayList<>();
@@ -84,6 +117,12 @@ public class CoreKafkaMultiMessageConverter {
         return headers;
     }
 
+    /**
+     * マルチメッセージをデコードします。
+     * 
+     * @param multiMessageDecoder マルチメッセージデコーダ
+     * @return マルチメッセージ
+     */
     private List<CoreKafkaMultiMessage> decodeCoreKafkaMultiMessages(MultiMessageDecoder multiMessageDecoder) {
         MultiMessageDecoder.MessagesDecoder messagesDecoder = multiMessageDecoder.messages();
         List<CoreKafkaMultiMessage> messages = new ArrayList<>();
@@ -109,6 +148,12 @@ public class CoreKafkaMultiMessageConverter {
         return messages;
     }
 
+    /**
+     * マルチメッセージのヘッダーをデコードします。
+     * 
+     * @param messagesDecoder マルチメッセージデコーダ
+     * @return マルチメッセージのヘッダー
+     */
     private List<CoreKafkaMultiMessageHeader> decodeCoreKafkaMultiMessageHeaders(MultiMessageDecoder.MessagesDecoder messagesDecoder) {
         List<CoreKafkaMultiMessageHeader> messageHeaders = new ArrayList<>();
         MultiMessageDecoder.MessagesDecoder.HeadersDecoder messageHeadersDecoder = messagesDecoder.headers();
@@ -132,6 +177,12 @@ public class CoreKafkaMultiMessageConverter {
         return messageHeaders;
     }
 
+    /**
+     * バイト配列を文字列のリストに変換します。
+     *
+     * @param bytes 変換対象のバイト配列
+     * @return バイト配列にエンコードされた文字列のリスト
+     */
     public List<String> convertBytesToValues(byte[] bytes) {
         if (isMultiMessage(bytes)) {
             return convertBytesToMessages(bytes)
@@ -144,6 +195,12 @@ public class CoreKafkaMultiMessageConverter {
         }
     }
 
+    /**
+     * バイト配列がマルチメッセージかどうかを判定します。
+     *
+     * @param message バイト配列
+     * @return マルチメッセージの場合は `true`、そうでない場合は `false`
+     */
     public boolean isMultiMessage(byte[] message) {
         if (message.length < MAGIC_ID_BYTES.length) {
             return false;
@@ -158,6 +215,9 @@ public class CoreKafkaMultiMessageConverter {
         return true;
     }
 
+    /**
+     * メッセージを構築するビルダークラス。
+     */
     public static class MessageBuilder {
 
         private Optional<Integer> maxSize;
@@ -183,6 +243,12 @@ public class CoreKafkaMultiMessageConverter {
             return size;
         }
 
+        /**
+         * ヘッダーを設定します。
+         *
+         * @param headers ヘッダー
+         * @return ヘッダーの設定に成功した場合は `true`、失敗した場合は `false`
+         */
         public boolean setHeaders(List<CoreKafkaMultiMessagesHeader> headers) {
             int estimatedSize = KeyValue.estimateSize(headers);
 
@@ -197,6 +263,12 @@ public class CoreKafkaMultiMessageConverter {
             return true;
         }
 
+        /**
+         * メッセージを追加します。
+         *
+         * @param message メッセージ
+         * @return メッセージの追加に成功した場合は `true`、失敗した場合は `false`
+         */
         public boolean addMessage(CoreKafkaMultiMessage message) {
             int estimatedSize = message.estimateSize();
 
@@ -211,10 +283,21 @@ public class CoreKafkaMultiMessageConverter {
             return true;
         }
 
+        /**
+         * メッセージのサイズが上限を超えているかどうかを判定します。
+         *
+         * @param estimatedSize 推定サイズ
+         * @return 上限を超えている場合は `true`、そうでない場合は `false`
+         */
         private boolean isSizeOverLimit(int estimatedSize) {
             return maxSize.map(ms -> size + estimatedSize > ms).orElse(false);
         }
 
+        /**
+         * メッセージをバイナリ配列に変換します。
+         *
+         * @return バイナリ配列
+         */
         public byte[] toBinaryArray() {
 
             ExpandableArrayBuffer buffer = new ExpandableArrayBuffer(2 * size); // Think about the size

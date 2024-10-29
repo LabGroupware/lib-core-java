@@ -72,6 +72,7 @@ core:
         schema: none
 ```
 
+
 ## Logging
 
 ``` yaml
@@ -86,9 +87,15 @@ application.yaml
 ``` yaml
 core:
     outbox:
-        id: 1 # database id generatorを使用する
+        id: 1 # database id generatorを使用する場合に指定
     database:
         schema: core # 使用するデータベーススキーマ名
+    kafka: # kafkaプロパティ
+        bootstrap:
+            servers: "localhost:9092" # kafkaサーバーアドレス
+        connection:
+            validation:
+                timeout: 1000 # 接続検証のタイムアウト時間(Default: 1000, 現在未使用)
 
 spring:
     datasource:
