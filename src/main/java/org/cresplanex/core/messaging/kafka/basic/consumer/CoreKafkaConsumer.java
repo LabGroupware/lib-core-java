@@ -246,12 +246,14 @@ public class CoreKafkaConsumer {
                 logger.debug("To commit {} {}", subscriberId, processor.getPending());
             }
 
+            // バックログ, 要するにスイムレーンのキューの状態を取得
             int backlog = processor.backlog();
 
             Set<TopicPartition> topicPartitions = new HashSet<>();
             for (ConsumerRecord<String, byte[]> record : records) {
                 topicPartitions.add(new TopicPartition(record.topic(), record.partition()));
             }
+            // スイムレーン状態に応じて負荷制御を行う
             BackPressureActions actions = backPressureManager.update(topicPartitions, backlog);
 
             if (!actions.pause.isEmpty()) {

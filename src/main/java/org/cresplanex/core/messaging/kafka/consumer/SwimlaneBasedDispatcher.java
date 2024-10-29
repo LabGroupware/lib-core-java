@@ -46,7 +46,7 @@ public class SwimlaneBasedDispatcher {
         Integer swimlane = partitionToSwimLaneMapping.toSwimlane(topicPartition, message.getMessageKey()); // スイムレーンの決定
         logger.trace("Dispatching to swimlane {} for {}", swimlane, message);
         SwimlaneDispatcher swimlaneDispatcher = getOrCreate(swimlane); // スイムレーンIDからスイムレーンディスパッチャの取得・ない場合の作成
-        return swimlaneDispatcher.dispatch(message, target);
+        return swimlaneDispatcher.dispatch(message, target); // スイムレーンディスパッチャに処理を委譲し, バックログ情報を返却, バックログ情報はスイムレーンディスパッチャのキューの状態を示す
     }
 
     /**
