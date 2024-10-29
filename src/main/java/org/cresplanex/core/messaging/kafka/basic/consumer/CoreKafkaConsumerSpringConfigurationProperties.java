@@ -2,16 +2,17 @@ package org.cresplanex.core.messaging.kafka.basic.consumer;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * KafkaコンシューマーのSpring構成プロパティクラス。
  * <p>
- * プロパティファイルの"core.local.kafka.consumer"プレフィックスに基づき、
+ * プロパティファイルの"core.kafka.consumer"プレフィックスに基づき、
  * Kafkaコンシューマーの設定を行います。
  * </p>
  */
-@ConfigurationProperties("core.local.kafka.consumer")
+@ConfigurationProperties("core.kafka.consumer")
 public class CoreKafkaConsumerSpringConfigurationProperties {
 
     Map<String, String> properties = new HashMap<>();

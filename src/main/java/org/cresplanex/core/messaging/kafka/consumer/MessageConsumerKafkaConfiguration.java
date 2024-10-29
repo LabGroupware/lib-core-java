@@ -14,9 +14,18 @@ import org.springframework.context.annotation.Import;
 @Import({CoreKafkaPropertiesConfiguration.class, CoreKafkaConsumerSpringConfigurationPropertiesConfiguration.class})
 public class MessageConsumerKafkaConfiguration {
 
+    // パーティションからスイムレーンへのデフォルトのマッピング
     @Autowired(required = false)
     private final TopicPartitionToSwimlaneMapping partitionToSwimLaneMapping = new OriginalTopicPartitionToSwimlaneMapping();
 
+    /**
+     * Kafkaメッセージを消費するMessageConsumerKafkaImplビーンを作成
+     *
+     * @param props Kafkaの基本プロパティ
+     * @param coreKafkaConsumerConfigurationProperties Kafkaコンシューマの設定
+     * @param kafkaConsumerFactory Kafkaコンシューマを生成するファクトリ
+     * @return 設定済みのMessageConsumerKafkaImplインスタンス
+     */
     @Bean
     public MessageConsumerKafkaImpl messageConsumerKafka(CoreKafkaConfigurationProperties props,
             CoreKafkaConsumerConfigurationProperties coreKafkaConsumerConfigurationProperties,

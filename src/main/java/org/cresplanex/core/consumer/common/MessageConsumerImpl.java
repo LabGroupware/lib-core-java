@@ -14,52 +14,52 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class MessageConsumerImpl implements MessageConsumer {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  // This could be implemented as Around advice
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private final ChannelMapping channelMapping;
-  private final MessageConsumerImplementation target;
-  private final DecoratedMessageHandlerFactory decoratedMessageHandlerFactory;
-  private final SubscriberMapping subscriberMapping;
+    // This could be implemented as Around advice
+    private final ChannelMapping channelMapping;
+    private final MessageConsumerImplementation target;
+    private final DecoratedMessageHandlerFactory decoratedMessageHandlerFactory;
+    private final SubscriberMapping subscriberMapping;
 
-  public MessageConsumerImpl(ChannelMapping channelMapping,
-                                MessageConsumerImplementation target,
-                                DecoratedMessageHandlerFactory decoratedMessageHandlerFactory,
-                                SubscriberMapping subscriberMapping) {
-    this.channelMapping = channelMapping;
-    this.target = target;
-    this.decoratedMessageHandlerFactory = decoratedMessageHandlerFactory;
-    this.subscriberMapping = subscriberMapping;
-  }
+    public MessageConsumerImpl(ChannelMapping channelMapping,
+            MessageConsumerImplementation target,
+            DecoratedMessageHandlerFactory decoratedMessageHandlerFactory,
+            SubscriberMapping subscriberMapping) {
+        this.channelMapping = channelMapping;
+        this.target = target;
+        this.decoratedMessageHandlerFactory = decoratedMessageHandlerFactory;
+        this.subscriberMapping = subscriberMapping;
+    }
 
-  @Override
-  public MessageSubscription subscribe(String subscriberId, Set<String> channels, MessageHandler handler) {
-    logger.info("Subscribing: subscriberId = {}, channels = {}", subscriberId, channels);
+    @Override
+    public MessageSubscription subscribe(String subscriberId, Set<String> channels, MessageHandler handler) {
+        logger.info("Subscribing: subscriberId = {}, channels = {}", subscriberId, channels);
 
-    Consumer<SubscriberIdAndMessage> decoratedHandler = decoratedMessageHandlerFactory.decorate(handler);
+        Consumer<SubscriberIdAndMessage> decoratedHandler = decoratedMessageHandlerFactory.decorate(handler);
 
-    MessageSubscription messageSubscription = target.subscribe(subscriberMapping.toExternal(subscriberId),
-            channels.stream().map(channelMapping::transform).collect(Collectors.toSet()),
-            message -> decoratedHandler.accept(new SubscriberIdAndMessage(subscriberId, message)));
+        MessageSubscription messageSubscription = target.subscribe(subscriberMapping.toExternal(subscriberId),
+                channels.stream().map(channelMapping::transform).collect(Collectors.toSet()),
+                message -> decoratedHandler.accept(new SubscriberIdAndMessage(subscriberId, message)));
 
-    logger.info("Subscribed: subscriberId = {}, channels = {}", subscriberId, channels);
+        logger.info("Subscribed: subscriberId = {}, channels = {}", subscriberId, channels);
 
-    return messageSubscription;
-  }
+        return messageSubscription;
+    }
 
-  @Override
-  public String getId() {
-    return target.getId();
-  }
+    @Override
+    public String getId() {
+        return target.getId();
+    }
 
-  @Override
-  public void close() {
-    logger.info("Closing consumer");
+    @Override
+    public void close() {
+        logger.info("Closing consumer");
 
-    target.close();
+        target.close();
 
-    logger.info("Closed consumer");
-  }
+        logger.info("Closed consumer");
+    }
 
 }

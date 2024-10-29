@@ -1,5 +1,13 @@
 package org.cresplanex.core.messaging.kafka.basic.consumer;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -7,13 +15,22 @@ import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 
-import java.time.Duration;
-import java.util.*;
-
+/**
+ * Kafkaメッセージコンシューマのデフォルト実装。
+ * <p>
+ * このクラスはKafkaの{@link KafkaConsumer}をラップし、Kafkaメッセージの消費に関する操作を提供します。
+ * </p>
+ */
 public class DefaultKafkaMessageConsumer implements KafkaMessageConsumer {
 
     private final KafkaConsumer<String, byte[]> delegate;
 
+    /**
+     * プロパティを使用してKafkaメッセージコンシューマを作成します。
+     *
+     * @param properties コンシューマプロパティ
+     * @return Kafkaメッセージコンシューマ
+     */
     public static KafkaMessageConsumer create(Properties properties) {
         return new DefaultKafkaMessageConsumer(new KafkaConsumer<>(properties));
     }
@@ -86,5 +103,4 @@ public class DefaultKafkaMessageConsumer implements KafkaMessageConsumer {
     public void close(Duration duration) {
         delegate.close(duration);
     }
-
 }

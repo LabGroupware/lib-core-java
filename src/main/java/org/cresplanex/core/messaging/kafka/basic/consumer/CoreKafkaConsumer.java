@@ -26,27 +26,39 @@ import org.slf4j.LoggerFactory;
  */
 public class CoreKafkaConsumer {
 
-   private static final Logger logger = LoggerFactory.getLogger(CoreKafkaConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(CoreKafkaConsumer.class);
 
-    /** サブスクライバーID */
+    /**
+     * サブスクライバーID
+     */
     private final String subscriberId;
 
-    /** メッセージハンドラ */
+    /**
+     * メッセージハンドラ
+     */
     private final CoreKafkaConsumerMessageHandler handler;
 
-    /** トピックリスト */
+    /**
+     * トピックリスト
+     */
     private final List<String> topics;
 
-    /** Kafkaコンシューマーを生成するファクトリ */
+    /**
+     * Kafkaコンシューマーを生成するファクトリ
+     */
     private final KafkaConsumerFactory kafkaConsumerFactory;
 
-    /** バックプレッシャー設定 */
+    /**
+     * バックプレッシャー設定
+     */
     private final BackPressureConfig backPressureConfig;
 
     private final AtomicBoolean stopFlag = new AtomicBoolean(false);
     private final Properties consumerProperties;
 
-    /** コンシューマーの状態 */
+    /**
+     * コンシューマーの状態
+     */
     private volatile CoreKafkaConsumerState state = CoreKafkaConsumerState.CREATED;
 
     private volatile boolean closeConsumerOnStop = true;
@@ -57,8 +69,8 @@ public class CoreKafkaConsumer {
      * CoreKafkaConsumerのコンストラクタ。
      *
      * @param subscriberId サブスクライバーID
-     * @param handler      メッセージハンドラ
-     * @param topics       購読するトピックリスト
+     * @param handler メッセージハンドラ
+     * @param topics 購読するトピックリスト
      * @param bootstrapServers Kafkaのブートストラップサーバーアドレス
      * @param coreKafkaConsumerConfigurationProperties コンシューマーの設定プロパティ
      * @param kafkaConsumerFactory Kafkaコンシューマーを生成するファクトリ
@@ -95,7 +107,7 @@ public class CoreKafkaConsumer {
      * トピックの存在を確認するメソッド。
      *
      * @param consumer Kafkaコンシューマー
-     * @param topic    確認するトピック名
+     * @param topic 確認するトピック名
      * @return トピックのパーティション情報リスト
      */
     public static List<PartitionInfo> verifyTopicExistsBeforeSubscribing(KafkaMessageConsumer consumer, String topic) {
@@ -110,10 +122,10 @@ public class CoreKafkaConsumer {
         }
     }
 
-     /**
+    /**
      * オフセットをコミットするメソッド。
      *
-     * @param consumer  Kafkaコンシューマー
+     * @param consumer Kafkaコンシューマー
      * @param processor メッセージプロセッサ
      */
     private void maybeCommitOffsets(KafkaMessageConsumer consumer, KafkaMessageProcessor processor) {
@@ -182,7 +194,7 @@ public class CoreKafkaConsumer {
         }
     }
 
-     /**
+    /**
      * 指定したコンシューマを使ってトピックにサブスクライブする。
      *
      * @param consumer Kafkaコンシューマー
@@ -196,13 +208,13 @@ public class CoreKafkaConsumer {
     /**
      * コンシューマのポーリングループを実行する。
      *
-     * @param consumer          Kafkaコンシューマー
-     * @param processor         メッセージプロセッサ
+     * @param consumer Kafkaコンシューマー
+     * @param processor メッセージプロセッサ
      * @param backPressureManager バックプレッシャーマネージャ
      */
     private void runPollingLoop(KafkaMessageConsumer consumer, KafkaMessageProcessor processor, BackPressureManager backPressureManager) {
         while (!stopFlag.get()) {
-            ConsumerRecords<String, byte[]> records = consumer.poll(Duration.of(100, ChronoUnit.MILLIS));
+            ConsumerRecords<String, byte[]> records = consumer.poll(Duration.of(100, ChronoUnit.MILLIS)); // 100msおきにポーリング
             if (!records.isEmpty()) {
                 logger.debug("Got {} {} records", subscriberId, records.count());
             }
@@ -216,7 +228,7 @@ public class CoreKafkaConsumer {
                         logger.debug("CoreKafkaAggregateSubscriptions subscriber = {}, offset = {}, key = {}, value = {}", subscriberId, record.offset(), record.key(), record.value());
                         // logger.debug(String.format("CoreKafkaAggregateSubscriptions subscriber = %s, offset = %d, key = %s, value = %s", subscriberId, record.offset(), record.key(), record.value()));
                     }
-                    processor.process(record);
+                    processor.process(record); // メッセージの処理
                 }
             }
             if (!records.isEmpty()) {

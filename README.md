@@ -72,6 +72,64 @@ core:
         schema: none
 ```
 
+## 呼び出し関係
+
+### Common/JDBC
+
+``` txt
+CoreCommonJdbcOperations: このパッケージのアーティファクト.
+-> CoreJdbcOperationsUtils: イベントやメッセージテーブルへのコマンドなどのSQLを発行する.
+    -> CoreSqlDialect: 各DBMSの挙動誤差を隠すインタフェース.
+-> CoreJdbcStatementExecutor: SQLの実行を行うインタフェース. -> CoreCommonJdbcStatementExecutor(java.sqlによる実装), CoreSpringJdbcStatementExecutor(spring.jdbcによる実装)
+-> CoreSqlDialect: 各DBMSの挙動誤差を隠すインタフェース
+-> OutboxPartitioningSpec: アウトボックステーブル数とパーティション数を定義したクラス.
+
+CoreSqlDialectOrder: 優先する順序を取得するメソッドを持つインタフェース.
+-> CoreSqlDialect: 各DBMSの挙動誤差を隠すインタフェース. -> AbstractCoreSqlDialect: 共通アブストラクト -> DefaultCoreSqlDialect, MsSqlDialect, MySqlDialect, PostgresDialect
+
+SqlDialectSelector: 利用する実装クラスを選択するためのクラス.
+
+CoreTransactionTemplate: このパッケージのアーティファクト, トランザクション内での処理実行を定義するテンプレートインターフェース. -> CoreSpringTransactionTemplate(springによる実装)
+
+CoreSqlException: SQLに関するエラー全般のラッパー -> CoreDuplicateKeyException: 重複キーエラー
+```
+
+### messaging/kafka
+
+``` txt
+CoreKafkaConsumer: コンシューマーの実装クラス
+-> CoreKafkaConsumerMessageHandler: メッセージハンドラインタフェース -> MessageConsumerKafkaImplの中で定義されている.
+-> KafkaConsumerFactory: Kafkaコンシューマー(原子操作)を生成するファクトリ -> DefaultKafkaConsumerFactory
+    -> KafkaMessageConsumer: Kafkaメッセージコンシューマ(原子操作) -> DefaultKafkaMessageConsumer
+-> BackPressureConfig: Kafkaコンシューマの負荷制御のためのしきい値(低・高)を設定
+-> CoreKafkaConsumerState: コンシューマの状態.
+-> ConsumerCallbacks: Kafkaコンシューマのコミットに関連するコールバックを定義するインターフェース.
+-> ConsumerPropertiesFactory: Kafkaの接続用デフォルトプロパティ + CoreKafkaConsumerConfigurationProperties: Kafkaプロパティ(上書き)
+-> KafkaMessageProcessor: Kafkaメッセージの処理と, 成功したメッセージオフセットのトラッキングを行う.
+    -> CoreKafkaConsumerMessageHandler: メッセージハンドラインタフェース
+    -> OffsetTracker: パーティションとオフセット情報のマッピング.
+        -> TopicPartitionOffsets: オフセット情報.
+    -> BackPressureManager: 負荷状況に応じて, トピックパーティションの一時停止や再開を制御.
+        -> BackPressureManagerStateAndActions: 負荷制御におけるマネージャステートとアクション.
+            -> BackPressureActions: 負荷制御に対して, どんなアクションをとるか.
+        -> BackPressureConfig
+        -> BackPressureManagerState: バックプレッシャーのステートインタフェース. -> BackPressureManagerNormalState, BackPressureManagerPausedState
+    -> MessageConsumerBacklog: バックログを表す. -> SwimlaneDispatcherBacklog
+
+KafkaMessage: Kafkaで扱うメッセージ
+KafkaMessageHandler, ReactiveKafkaMessageHandler: Kafkaメッセージハンドラのインタフェース.
+KafkaSubscription: サブスクリプションを表し, closeで呼び出されるコールバックを登録できる.
+
+MessageConsumerKafkaImpl: 複数のKafkaメッセージを管理し, 指定されたハンドラーでメッセージを処理.(スイムレーン以外はCoreKafkaConsumerのラッパー)
+-> CoreKafkaConsumer: コンシューマの実装クラス.
+-> SwimlaneBasedDispatcher: スイムレーンごとに振り分けて処理するためのディスパッチャ, スイムレーンごとに別々の処理キューを持ち、メッセージの分散処理を行う.これを利用したCoreKafkaConsumerMessageHandlerを使って, CoreKafkaConsumerの生成を行う.
+    -> RawKafkaMessage: 生のKafkaMessageデータを使用.
+    -> TopicPartitionToSwimlaneMapping: パーティションを基に, メッセージ処理のスイムレーンIDを割り当てるインターフェース. -> SwimlanePerTopicPartition(パーティションごとに個別のスイムレーン), OriginalTopicPartitionToSwimlaneMapping(パーティションIDをそのままスイムレーンとして使用(Default)), MultipleSwimlanesPerTopicPartitionMapping(パーティションごとに複数のスイムレーンをマッピング)
+    -> SwimlaneDispatcher: スイムレーンに基づいてメッセージをキューに蓄積し, 順次処理するディスパッチャ.ただし, 実際の処理内容は, MessageConsumerKafkaImpl内のhandleで定義している.また, この中でもRawKafkaMessageからKafkaMessageに変換されたあと, KafkaMessageHandler, ReactiveKafkaMessageHandlerが呼ばれている.
+-> KafkaSubscription: CoreKafkaConsumerの生成後, これのサブスクリプションを解除できるように, コールバックを設定したKafkaSubscriptionを返す.
+
+CommonMessageConsumer: 複数のKafkaメッセージを管理し、 指定されたハンドラーでメッセージを処理. -> MessageConsumerKafkaImpl
+```
 
 ## Logging
 

@@ -14,22 +14,22 @@ import org.springframework.context.annotation.Bean;
 public class CoreKafkaConsumerSpringConfigurationPropertiesConfiguration {
 
     /**
-     * CoreKafkaConsumerConfigurationProperties Beanを作成し、
-     * SpringのDIコンテナに登録します。
+     * CoreKafkaConsumerConfigurationProperties Beanを作成し、 SpringのDIコンテナに登録します。
      *
-     * @param coreKafkaConsumerSpringConfigurationProperties Springから注入されたKafkaコンシューマー構成プロパティ
+     * @param coreKafkaConsumerSpringConfigurationProperties
+     * Springから注入されたKafkaコンシューマー構成プロパティ
      * @return CoreKafkaConsumerConfigurationPropertiesのインスタンス
      */
     @Bean
     public CoreKafkaConsumerConfigurationProperties coreKafkaConsumerConfigurationProperties(
             CoreKafkaConsumerSpringConfigurationProperties coreKafkaConsumerSpringConfigurationProperties) {
-        
-        CoreKafkaConsumerConfigurationProperties coreKafkaConsumerConfigurationProperties = 
-                new CoreKafkaConsumerConfigurationProperties(coreKafkaConsumerSpringConfigurationProperties.getProperties());
-        
+
+        CoreKafkaConsumerConfigurationProperties coreKafkaConsumerConfigurationProperties
+                = new CoreKafkaConsumerConfigurationProperties(coreKafkaConsumerSpringConfigurationProperties.getProperties());
+
         coreKafkaConsumerConfigurationProperties.setBackPressure(coreKafkaConsumerSpringConfigurationProperties.getBackPressure());
         coreKafkaConsumerConfigurationProperties.setPollTimeout(coreKafkaConsumerSpringConfigurationProperties.getPollTimeout());
-        
+
         return coreKafkaConsumerConfigurationProperties;
     }
 }
