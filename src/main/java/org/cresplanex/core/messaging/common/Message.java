@@ -90,8 +90,8 @@ public interface Message {
      *
      * @param headers the headers of the message
      */
-    
     void setHeaders(Map<String, String> headers);
+
     /**
      * Sets the value of the header with the given name.
      *
@@ -100,8 +100,9 @@ public interface Message {
      * @param name the name of the header
      * @param value the value of the header
      */
-    
+
     void setHeader(String name, String value);
+
     /**
      * Removes the header with the given name.
      *
@@ -109,6 +110,6 @@ public interface Message {
      *
      * @param key the name of the header
      */
-    
+
     void removeHeader(String key);
 }

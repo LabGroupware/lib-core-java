@@ -8,7 +8,7 @@ import java.util.Collection;
 
 import org.cresplanex.core.saga.common.SagaLockManager;
 import org.cresplanex.core.commands.producer.CommandProducer;
-import org.cresplanex.core.commands.producer.CommandProducerConfiguration;
+import org.cresplanex.core.commands.producer.CoreCommandProducerConfiguration;
 import org.cresplanex.core.common.id.ApplicationIdGenerator;
 import org.cresplanex.core.common.jdbc.CoreJdbcStatementExecutor;
 import org.cresplanex.core.common.jdbc.CoreSchema;
@@ -16,7 +16,7 @@ import org.cresplanex.core.messaging.consumer.MessageConsumer;
 import org.cresplanex.core.saga.common.CoreSagaCommonConfiguration;
 
 @Configuration
-@Import({CommandProducerConfiguration.class, CoreSagaCommonConfiguration.class})
+@Import({CoreCommandProducerConfiguration.class, CoreSagaCommonConfiguration.class})
 public class SagaOrchestratorConfiguration {
 
     @Bean

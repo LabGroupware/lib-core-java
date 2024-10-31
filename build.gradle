@@ -1,13 +1,13 @@
 plugins {
-	id 'java'
+	id 'java-library'
 	id 'org.springframework.boot' version '3.3.5'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id 'org.cresplanex.core.sbe-tool'
+	id 'maven-publish'
 }
 
-apply plugin: SbeToolPlugin
-
 group = 'org.cresplanex'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0'
 
 java {
 	toolchain {
@@ -17,6 +17,20 @@ java {
 
 repositories {
 	mavenCentral()
+}
+
+publishing {
+	publications {
+		maven(MavenPublication) {
+			from components.java
+		}
+	}
+	repositories {
+        maven {
+            name = "local"
+            url = uri("file://${System.getProperty("user.home")}/.m2/repository")
+        }
+    }
 }
 
 ext {
@@ -38,14 +52,6 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-sourceSets {
-    main {
-        java {
-            srcDirs += "$buildDir/generated-sources/sbe"  // 生成されたコードのディレクトリ
-        }
-    }
 }
 
 tasks.withType(JavaCompile) {

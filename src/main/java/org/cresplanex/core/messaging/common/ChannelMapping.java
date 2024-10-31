@@ -16,5 +16,4 @@ public interface ChannelMapping {
      * @return the transformed channel
      */
     String transform(String channel);
-
 }

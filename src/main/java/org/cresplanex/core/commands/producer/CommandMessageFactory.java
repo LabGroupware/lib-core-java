@@ -7,7 +7,7 @@ import org.cresplanex.core.commands.common.CommandMessageHeaders;
 import org.cresplanex.core.commands.common.CommandNameMapping;
 import org.cresplanex.core.common.json.mapper.JSonMapper;
 import org.cresplanex.core.messaging.common.Message;
-import org.cresplanex.core.messaging.producer.MessageBuilder;
+import org.cresplanex.core.messaging.common.MessageBuilder;
 
 public class CommandMessageFactory {
 

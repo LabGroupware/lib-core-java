@@ -3,7 +3,7 @@ package org.cresplanex.core.saga.orchestration;
 import java.util.function.Function;
 
 import org.cresplanex.core.events.common.DomainEvent;
-import org.cresplanex.core.events.subscriber.DomainEventEnvelope;
+import org.cresplanex.core.events.common.DomainEventEnvelope;
 
 public class SagaEventHandler<Data> {
 

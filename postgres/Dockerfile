@@ -1,7 +1,7 @@
 FROM postgres:16.4-bullseye
 
 RUN  apt-get update \
-    && apt-get install -y --no-install-recommends postgresql-16-wal2json=2.5-2 \
+    && apt-get install -y --no-install-recommends postgresql-16-wal2json \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the custom configuration which will be passed down to the server (using a .sample file is the preferred way of doing it by

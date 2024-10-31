@@ -1,6 +1,21 @@
 plugins {
 	id 'java-library'
+	id 'groovy'
+ 	id 'java-gradle-plugin'
+  	id 'maven-publish'
 }
+
+gradlePlugin { 
+    plugins {
+        SbeToolPlugin {
+            id = 'org.cresplanex.core.sbe-tool'
+            implementationClass = 'org.cresplanex.core.SbeToolPlugin'
+        }
+    }
+}
+
+group 'org.cresplanex'
+version '1.0.0'
 
 repositories {
     mavenCentral()

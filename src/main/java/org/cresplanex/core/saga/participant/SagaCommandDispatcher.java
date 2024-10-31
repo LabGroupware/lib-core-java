@@ -17,8 +17,8 @@ import org.cresplanex.core.commands.consumer.CommandReplyProducer;
 import org.cresplanex.core.commands.consumer.CommandReplyToken;
 import org.cresplanex.core.commands.consumer.PathVariables;
 import org.cresplanex.core.messaging.common.Message;
+import org.cresplanex.core.messaging.common.MessageBuilder;
 import org.cresplanex.core.messaging.consumer.MessageConsumer;
-import org.cresplanex.core.messaging.producer.MessageBuilder;
 
 public class SagaCommandDispatcher extends CommandDispatcher {
 

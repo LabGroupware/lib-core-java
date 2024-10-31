@@ -9,7 +9,7 @@ import org.cresplanex.core.commands.common.ReplyMessageHeaders;
 import org.cresplanex.core.commands.common.Success;
 import org.cresplanex.core.common.json.mapper.JSonMapper;
 import org.cresplanex.core.messaging.common.Message;
-import org.cresplanex.core.messaging.producer.MessageBuilder;
+import org.cresplanex.core.messaging.common.MessageBuilder;
 
 public class SagaReplyMessageBuilder extends MessageBuilder {
 

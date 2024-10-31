@@ -9,7 +9,7 @@ import org.cresplanex.core.common.jdbc.CoreJdbcStatementExecutor;
 import org.cresplanex.core.common.jdbc.CoreSchema;
 import org.cresplanex.core.common.json.mapper.JSonMapper;
 import org.cresplanex.core.messaging.common.Message;
-import org.cresplanex.core.messaging.producer.MessageBuilder;
+import org.cresplanex.core.messaging.common.MessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

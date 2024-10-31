@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.cresplanex.core.events.common.DomainEvent;
+import org.cresplanex.core.events.common.DomainEventEnvelope;
 
 public class DomainEventHandlersBuilder {
 

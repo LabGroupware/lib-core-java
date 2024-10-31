@@ -10,8 +10,8 @@ import org.cresplanex.core.commands.common.CommandNameMapping;
 import org.cresplanex.core.commands.common.Failure;
 import org.cresplanex.core.common.json.mapper.JSonMapper;
 import org.cresplanex.core.messaging.common.Message;
+import org.cresplanex.core.messaging.common.MessageBuilder;
 import org.cresplanex.core.messaging.consumer.MessageConsumer;
-import org.cresplanex.core.messaging.producer.MessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,10 +70,6 @@ public class CommandDispatcher {
                     commandHandlerParams.getCorrelationHeaders(),
                     message);
 
-            // CommandMessage cm = new CommandMessage(message.getId(),
-            // commandHandlerParams.getCommand(),
-            // commandHandlerParams.getCorrelationHeaders(),
-            // message);
             replies = invoke(m, cm, commandHandlerParams.getPathVars(), commandReplyToken);
             logger.trace("Generated replies {} {} {}", commandDispatcherId, message, replies);
         } catch (Exception e) {
@@ -86,8 +82,7 @@ public class CommandDispatcher {
         commandReplyProducer.sendReplies(commandReplyToken, replies);
     }
 
-    // protected List<Message> invoke(CommandHandler commandHandler, CommandMessage cm, Map<String, String> pathVars, CommandReplyToken commandReplyToken) {
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     protected List<Message> invoke(CommandHandler commandHandler, CommandMessage<?> cm, Map<String, String> pathVars, CommandReplyToken commandReplyToken) {
         return commandHandler.invokeMethod(new CommandHandlerArgs(cm, new PathVariables(pathVars), commandReplyToken));
     }
