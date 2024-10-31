@@ -13,7 +13,7 @@ import org.cresplanex.core.messaging.common.MessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SagaLockManagerImpl implements SagaLockManager {
+public class SagaLockManageJdbc implements SagaLockManager {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -21,7 +21,7 @@ public class SagaLockManagerImpl implements SagaLockManager {
 
     private final SagaLockManagerSql sagaLockManagerSql;
 
-    public SagaLockManagerImpl(CoreJdbcStatementExecutor coreJdbcStatementExecutor, CoreSchema coreSchema) {
+    public SagaLockManageJdbc(CoreJdbcStatementExecutor coreJdbcStatementExecutor, CoreSchema coreSchema) {
         this.coreJdbcStatementExecutor = coreJdbcStatementExecutor;
 
         sagaLockManagerSql = new SagaLockManagerSql(coreSchema);

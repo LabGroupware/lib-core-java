@@ -8,9 +8,6 @@ public class LockTarget {
         this(targetClass.getName(), targetId.toString());
     }
 
-    //   public LockTarget(Class targetClass, Object targetId) {
-    //     this(targetClass.getName(), targetId.toString());
-    // }
     public LockTarget(String targetClass, String targetId) {
         this(targetClass + "/" + targetId);
     }

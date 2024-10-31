@@ -100,41 +100,6 @@ public class SagaCommandDispatcher extends CommandDispatcher {
         }
     }
 
-    // @Override
-    // protected List<Message> invoke(CommandHandler commandHandler, CommandMessage cm, Map<String, String> pathVars, CommandReplyToken commandReplyToken) {
-    //     Optional<String> lockedTarget = Optional.empty();
-    // if (commandHandler instanceof SagaCommandHandler) {
-    //     SagaCommandHandler sch = (SagaCommandHandler) commandHandler;
-    //     if (sch.getPreLock().isPresent()) {
-    //         LockTarget lockTarget = sch.getPreLock().get().apply(cm, new PathVariables(pathVars)); // TODO
-    //         Message message = cm.getMessage();
-    //         String sagaType = getSagaType(message);
-    //         String sagaId = getSagaId(message);
-    //         String target = lockTarget.getTarget();
-    //         lockedTarget = Optional.of(target);
-    //         if (!sagaLockManager.claimLock(sagaType, sagaId, target)) {
-    //             throw new StashMessageRequiredException(target);
-    //         }
-    //     }
-    // }
-    //     List<Message> messages = super.invoke(commandHandler, cm, pathVars, commandReplyToken);
-    //     if (lockedTarget.isPresent()) {
-    //         return addLockedHeader(messages, lockedTarget.get());
-    //     } else {
-    //         Optional<LockTarget> lt = getLock(messages);
-    //         if (lt.isPresent()) {
-    //             Message message = cm.getMessage();
-    //             String sagaType = getSagaType(message);
-    //             String sagaId = getSagaId(message);
-    //             if (!sagaLockManager.claimLock(sagaType, sagaId, lt.get().getTarget())) {
-    //                 throw new RuntimeException("Cannot claim lock");
-    //             }
-    //             return addLockedHeader(messages, lt.get().getTarget());
-    //         } else {
-    //             return messages;
-    //         }
-    //     }
-    // }
     private Optional<LockTarget> getLock(List<Message> messages) {
         return messages.stream().filter(m -> m instanceof SagaReplyMessage && ((SagaReplyMessage) m).hasLockTarget()).findFirst().flatMap(m -> ((SagaReplyMessage) m).getLockTarget());
     }

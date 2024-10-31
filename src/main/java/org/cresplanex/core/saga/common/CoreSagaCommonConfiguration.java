@@ -14,6 +14,6 @@ public class CoreSagaCommonConfiguration {
     @Bean
     public SagaLockManager sagaLockManager(CoreJdbcStatementExecutor coreJdbcStatementExecutor,
             CoreSchema coreSchema) {
-        return new SagaLockManagerImpl(coreJdbcStatementExecutor, coreSchema);
+        return new SagaLockManageJdbc(coreJdbcStatementExecutor, coreSchema);
     }
 }
