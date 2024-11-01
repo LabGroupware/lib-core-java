@@ -15,14 +15,21 @@ import org.cresplanex.core.commands.producer.CommandProducer;
 import org.cresplanex.core.messaging.common.Message;
 import org.cresplanex.core.messaging.common.MessageBuilder;
 import org.cresplanex.core.messaging.consumer.MessageConsumer;
-import org.cresplanex.core.saga.common.LockTarget;
 import org.cresplanex.core.saga.common.SagaCommandHeaders;
-import org.cresplanex.core.saga.common.SagaLockManager;
 import org.cresplanex.core.saga.common.SagaReplyHeaders;
-import org.cresplanex.core.saga.common.SagaUnlockCommand;
+import org.cresplanex.core.saga.lock.LockTarget;
+import org.cresplanex.core.saga.lock.SagaLockManager;
+import org.cresplanex.core.saga.lock.SagaUnlockCommand;
+import org.cresplanex.core.saga.orchestration.command.SagaCommandProducer;
+import org.cresplanex.core.saga.orchestration.repository.SagaInstance;
+import org.cresplanex.core.saga.orchestration.repository.SagaInstanceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * サーガの実行管理を行う {@link SagaManagerImpl} クラス。
+ * 指定されたサーガのライフサイクルを管理し、メッセージの受信とコマンドの送信を行います。
+ */
 public class SagaManagerImpl<Data>
         implements SagaManager<Data> {
 
@@ -35,6 +42,16 @@ public class SagaManagerImpl<Data>
     private SagaLockManager sagaLockManager;
     private SagaCommandProducer sagaCommandProducer;
 
+    /**
+     * コンストラクタ。依存するオブジェクトを注入し、サーガの実行を管理するための準備を行います。
+     *
+     * @param saga サーガの定義
+     * @param sagaInstanceRepository サーガインスタンスのリポジトリ
+     * @param commandProducer コマンドプロデューサー
+     * @param messageConsumer メッセージコンシューマー
+     * @param sagaLockManager サーガロックマネージャー
+     * @param sagaCommandProducer サーガコマンドプロデューサー
+     */
     public SagaManagerImpl(Saga<Data> saga,
             SagaInstanceRepository sagaInstanceRepository,
             CommandProducer commandProducer,
@@ -79,29 +96,43 @@ public class SagaManagerImpl<Data>
         return create(data, Optional.of(new LockTarget(targetClass, targetId).getTarget()));
     }
 
+    /**
+     * 新しいサーガインスタンスを作成し、必要に応じてロックを獲得します。 サーガの開始アクションを実行し、アクション結果を処理します。
+     *
+     * @param sagaData サーガに渡すデータ
+     * @param resource オプションのロック対象リソース
+     * @return 作成されたサーガインスタンス
+     */
     @Override
     public SagaInstance create(Data sagaData, Optional<String> resource) {
 
+        // SagaInstanceの作成
+        // ただし, ここではサーガのタイプとデータのみを保存する
         SagaInstance sagaInstance = new SagaInstance(getSagaType(),
                 null,
                 "????",
                 null,
                 SagaDataSerde.serializeSagaData(sagaData), new HashSet<>());
 
+        // サーガインスタンス上方と参加者情報を保存
         sagaInstanceRepository.save(sagaInstance);
 
+        // 生成されたIDを取得
         String sagaId = sagaInstance.getId();
 
+        // sagaスタート時のコールバックを実行
         saga.onStarting(sagaId, sagaData);
 
+        // ロックが必要な場合はロックを獲得
         resource.ifPresent(r -> {
             if (!sagaLockManager.claimLock(getSagaType(), sagaId, r)) {
                 throw new RuntimeException("Cannot claim lock for resource");
             }
         });
 
+        // サーガの開始アクションを取得
         SagaActions<Data> actions = getStateDefinition().start(sagaData);
-
+        // ローカル例外がある場合は, その例外を投げる
         actions.getLocalException().ifPresent(e -> {
             throw e;
         });
@@ -111,11 +142,21 @@ public class SagaManagerImpl<Data>
         return sagaInstance;
     }
 
+    /**
+     * サーガの終了アクションを実行し、サーガの完了、ロールバック、失敗時の処理を行います。
+     *
+     * @param sagaId サーガID
+     * @param sagaInstance サーガインスタンス
+     * @param compensating ロールバック中かどうか
+     * @param failed 失敗したかどうか
+     * @param sagaData サーガデータ
+     */
     private void performEndStateActions(String sagaId, SagaInstance sagaInstance, boolean compensating, boolean failed, Data sagaData) {
-        for (DestinationAndResource dr : sagaInstance.getDestinationsAndResources()) {
+        for (DestinationAndResource dr : sagaInstance.getDestinationsAndResources()) { // 全てのアンロックが必要なDestinationAndResourceに対して
             Map<String, String> headers = new HashMap<>();
+            // saga情報をヘッダに追加
             headers.put(SagaCommandHeaders.SAGA_ID, sagaId);
-            headers.put(SagaCommandHeaders.SAGA_TYPE, getSagaType()); // FTGO SagaCommandHandler failed without this but the OrdersAndCustomersIntegrationTest was fine?!?
+            headers.put(SagaCommandHeaders.SAGA_TYPE, getSagaType());
             commandProducer.send(dr.getDestination(), dr.getResource(), new SagaUnlockCommand(), makeSagaReplyChannel(), headers);
         }
 
@@ -144,6 +185,9 @@ public class SagaManagerImpl<Data>
         return saga.getSagaType();
     }
 
+    /**
+     * サーガのリプライチャンネルにサブスクライブします。
+     */
     @Override
     public void subscribeToReplyChannel() {
         messageConsumer.subscribe(saga.getSagaType() + "-consumer", singleton(makeSagaReplyChannel()),
@@ -154,6 +198,11 @@ public class SagaManagerImpl<Data>
         return getSagaType() + "-reply";
     }
 
+    /**
+     * メッセージを処理します。リプライメッセージの場合はリプライ処理を行います。
+     *
+     * @param message 処理するメッセージ
+     */
     public void handleMessage(Message message) {
         logger.debug("handle message invoked {}", message);
         if (message.hasHeader(SagaReplyHeaders.REPLY_SAGA_ID)) {
@@ -163,8 +212,14 @@ public class SagaManagerImpl<Data>
         }
     }
 
+    /**
+     * リプライメッセージを処理し、サーガの現在の状態とアクションを実行します。
+     *
+     * @param message 処理するリプライメッセージ
+     */
     private void handleReply(Message message) {
 
+        // リプライがこのサーガタイプに対するものであるかどうかを確認
         if (!isReplyForThisSagaType(message)) {
             return;
         }
@@ -194,12 +249,23 @@ public class SagaManagerImpl<Data>
 
     }
 
+    /**
+     * 指定されたアクションに基づいてサーガの状態を更新し、必要に応じてリプライを待ちます。
+     *
+     * @param sagaType サーガタイプ
+     * @param sagaId サーガID
+     * @param sagaInstance サーガインスタンス
+     * @param sagaData サーガデータ
+     * @param actions 実行するアクション
+     */
     private void processActions(String sagaType, String sagaId, SagaInstance sagaInstance, Data sagaData, SagaActions<Data> actions) {
 
         while (true) {
 
             if (actions.getLocalException().isPresent()) {
 
+                // ローカル例外がある場合は, 失敗のリプライが送られる代わりにダミーでこのリプライメッセージを登録したアクションを次のアクションとする.
+                // ただし, 失敗メッセージなので、補償トランザクションの開始が行われるようにisSuccessfulReplyなどを実装する必要がある。
                 actions = getStateDefinition().handleReply(sagaType, sagaId, actions.getUpdatedState().get(), actions.getUpdatedSagaData().get(), MessageBuilder
                         .withPayload("{}")
                         .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, CommandReplyOutcome.FAILURE.name())
@@ -207,31 +273,48 @@ public class SagaManagerImpl<Data>
                         .build());
 
             } else {
-                // only do this if successful
-
+                // lastRequestIdには, 送信したメッセージIDが入る
+                // localStepの場合は, commandsが空なので, 何もせずlastRequestIdをnullはなる.
                 String lastRequestId = sagaCommandProducer.sendCommands(this.getSagaType(), sagaId, actions.getCommands(), this.makeSagaReplyChannel());
                 sagaInstance.setLastRequestId(lastRequestId);
 
+                // アクションに定義されたstateが入っている場合は, サーガの状態を更新する
                 updateState(sagaInstance, actions);
 
+                // サーガデータのシリアライズしたものをインスタンスに登録
                 sagaInstance.setSerializedSagaData(SagaDataSerde.serializeSagaData(actions.getUpdatedSagaData().orElse(sagaData)));
 
+                // サーガが終了状態の場合は, サーガの終了処理を行う
                 if (actions.isEndState()) {
                     performEndStateActions(sagaId, sagaInstance, actions.isCompensating(), actions.isFailed(), sagaData);
                 }
 
+                // サーガインスタンス情報を更新
                 sagaInstanceRepository.update(sagaInstance);
 
                 if (actions.isReplyExpected()) {
+                    // リプライを期待する場合 = 先程のsendCommandsで送信したコマンドに対するリプライを待つ必要がある場合,
+                    // 一度breakすることで, subscribeToReplyChannelで登録したハンドラが呼ばれるのを待つ
+                    // これをトリガーにして, stateが動き出す
                     break;
                 } else {
+                    // リプライが期待されない場合、すぐに次のアクションが実行できるので
                     actions = simulateSuccessfulReplyToLocalActionOrNotification(sagaType, sagaId, actions);
                 }
-
             }
         }
     }
 
+    /**
+     * 成功応答をシミュレートします。 メッセージにはダミーでの成功応答が含まれており, 次のアクションが実行されます。
+     * localStepの場合はもとより, onReplyの登録はできず, notificationの場合も必要としないため, このメソッドが呼ばれる。
+     * ただし, あくまで成功メッセージなので、補償トランザクションの開始は行われないようにisSuccessfulReplyなどを実装する必要がある。
+     *
+     * @param sagaType
+     * @param sagaId
+     * @param actions
+     * @return
+     */
     private SagaActions<Data> simulateSuccessfulReplyToLocalActionOrNotification(String sagaType, String sagaId, SagaActions<Data> actions) {
         return getStateDefinition().handleReply(sagaType, sagaId, actions.getUpdatedState().get(), actions.getUpdatedSagaData().get(), MessageBuilder
                 .withPayload("{}")

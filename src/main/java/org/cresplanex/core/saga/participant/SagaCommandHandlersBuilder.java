@@ -15,16 +15,31 @@ import org.cresplanex.core.commands.consumer.CommandMessage;
 import org.cresplanex.core.commands.consumer.CommandReplyToken;
 import org.cresplanex.core.messaging.common.Message;
 
+/**
+ * SagaCommandHandlersBuilderは、サガ内で使用されるコマンドハンドラのリストを構築するためのビルダークラスです。
+ * 各メソッドを使用して、特定のコマンドクラスに対するハンドラを追加できます。
+ */
 public class SagaCommandHandlersBuilder implements AbstractSagaCommandHandlersBuilder {
 
     private String channel;
-
     private final List<CommandHandler> handlers = new ArrayList<>();
 
+    /**
+     * 指定されたチャンネルから新しいSagaCommandHandlersBuilderを開始します。
+     *
+     * @param channel コマンドが送信されるチャンネル
+     * @return SagaCommandHandlersBuilderのインスタンス
+     */
     public static SagaCommandHandlersBuilder fromChannel(String channel) {
         return new SagaCommandHandlersBuilder().andFromChannel(channel);
     }
 
+    /**
+     * チャンネルを設定し、ビルダーのインスタンスを返します。
+     *
+     * @param channel コマンドが送信されるチャンネル
+     * @return このビルダーインスタンス
+     */
     private SagaCommandHandlersBuilder andFromChannel(String channel) {
         this.channel = channel;
         return this;
@@ -66,6 +81,14 @@ public class SagaCommandHandlersBuilder implements AbstractSagaCommandHandlersBu
         return new SagaCommandHandlerBuilder<>(this, h);
     }
 
+    /**
+     * BiConsumer型のハンドラを使用してコマンドメッセージを処理するメソッドを追加します。
+     *
+     * @param <C> コマンドの型
+     * @param commandClass コマンドクラスの型
+     * @param handler コマンドメッセージとコマンド返信トークンを処理する関数
+     * @return SagaCommandHandlerBuilderのインスタンス
+     */
     public <C extends Command> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, BiConsumer<CommandMessage<C>, CommandReplyToken> handler) {
         SagaCommandHandler h = new SagaCommandHandler(channel, commandClass,
                 args -> {
@@ -76,6 +99,11 @@ public class SagaCommandHandlersBuilder implements AbstractSagaCommandHandlersBu
         return new SagaCommandHandlerBuilder<>(this, h);
     }
 
+    /**
+     * 追加されたすべてのハンドラを含むCommandHandlersインスタンスを生成します。
+     *
+     * @return CommandHandlersインスタンス
+     */
     public CommandHandlers build() {
         return new CommandHandlers(handlers);
     }

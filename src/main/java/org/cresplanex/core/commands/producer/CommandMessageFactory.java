@@ -9,12 +9,36 @@ import org.cresplanex.core.common.json.mapper.JSonMapper;
 import org.cresplanex.core.messaging.common.Message;
 import org.cresplanex.core.messaging.common.MessageBuilder;
 
+/**
+ * コマンドメッセージを作成するファクトリクラス。
+ */
 public class CommandMessageFactory {
 
+    /**
+     * コマンドメッセージを作成します。
+     *
+     * @param commandNameMapping
+     * @param channel
+     * @param command
+     * @param replyTo
+     * @param headers
+     * @return
+     */
     public static Message makeMessage(CommandNameMapping commandNameMapping, String channel, Command command, String replyTo, Map<String, String> headers) {
         return makeMessage(commandNameMapping, channel, null, command, replyTo, headers);
     }
 
+    /**
+     * コマンドメッセージを作成します。
+     * 
+     * @param commandNameMapping
+     * @param channel
+     * @param resource
+     * @param command
+     * @param replyTo
+     * @param headers
+     * @return
+     */
     public static Message makeMessage(CommandNameMapping commandNameMapping, String channel, String resource, Command command, String replyTo, Map<String, String> headers) {
         MessageBuilder builder = MessageBuilder.withPayload(JSonMapper.toJson(command))
                 .withExtraHeaders("", headers) // TODO should these be prefixed??!

@@ -8,6 +8,11 @@ import java.util.function.BiConsumer;
 import org.cresplanex.core.commands.common.ReplyMessageHeaders;
 import org.cresplanex.core.messaging.common.Message;
 
+/**
+ * 参加者のアクションまたは補償処理を行うステップを表現するクラスです。
+ *
+ * @param <Data> サガデータのタイプ
+ */
 public class ParticipantInvocationStep<Data> implements SagaStep<Data> {
 
     private final Map<String, BiConsumer<Data, Object>> actionReplyHandlers;
@@ -15,6 +20,14 @@ public class ParticipantInvocationStep<Data> implements SagaStep<Data> {
     private final Optional<ParticipantInvocation<Data>> participantInvocation;
     private final Optional<ParticipantInvocation<Data>> compensation;
 
+    /**
+     * コンストラクタ。
+     *
+     * @param participantInvocation アクションの参加者インボケーション
+     * @param compensation 補償処理の参加者インボケーション
+     * @param actionReplyHandlers アクションの返信ハンドラー
+     * @param compensationReplyHandlers 補償処理の返信ハンドラー
+     */
     public ParticipantInvocationStep(Optional<ParticipantInvocation<Data>> participantInvocation,
             Optional<ParticipantInvocation<Data>> compensation,
             Map<String, BiConsumer<Data, Object>> actionReplyHandlers,

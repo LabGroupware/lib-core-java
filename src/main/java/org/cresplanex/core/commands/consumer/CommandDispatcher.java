@@ -15,6 +15,9 @@ import org.cresplanex.core.messaging.consumer.MessageConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * コマンドメッセージのディスパッチャー。 指定されたコマンドハンドラを用いてメッセージを処理し、必要に応じて返信メッセージを生成します。
+ */
 public class CommandDispatcher {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -29,6 +32,15 @@ public class CommandDispatcher {
 
     private final CommandReplyProducer commandReplyProducer;
 
+    /**
+     * コマンドディスパッチャーを構築します。
+     *
+     * @param commandDispatcherId コマンドディスパッチャーのID
+     * @param commandHandlers コマンドハンドラのセット
+     * @param messageConsumer メッセージコンシューマ
+     * @param commandNameMapping コマンド名のマッピング
+     * @param commandReplyProducer コマンド返信プロデューサー
+     */
     public CommandDispatcher(String commandDispatcherId,
             CommandHandlers commandHandlers,
             MessageConsumer messageConsumer,
@@ -41,18 +53,28 @@ public class CommandDispatcher {
         this.commandNameMapping = commandNameMapping;
     }
 
+    /**
+     * コマンドディスパッチャーを初期化し、指定されたチャネルにサブスクライブします。
+     */
     public void initialize() {
         messageConsumer.subscribe(commandDispatcherId,
                 commandHandlers.getChannels(),
                 this::messageHandler);
     }
 
+    /**
+     * 受信したメッセージを処理するメソッド。
+     *
+     * @param message 受信したメッセージ
+     */
     public void messageHandler(Message message) {
         logger.trace("Received message {} {}", commandDispatcherId, message);
 
+        // メッセージのコマンドタイプを内部用に設定
         message.setHeader(CommandMessageHeaders.COMMAND_TYPE,
                 commandNameMapping.externalCommandTypeToCommandClassName(message.getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE)));
 
+        // 適切なコマンドハンドラを検索
         Optional<CommandHandler> possibleMethod = commandHandlers.findTargetMethod(message);
         if (!possibleMethod.isPresent()) {
             throw new RuntimeException("No method for " + message);
@@ -82,11 +104,27 @@ public class CommandDispatcher {
         commandReplyProducer.sendReplies(commandReplyToken, replies);
     }
 
+    /**
+     * 指定されたコマンドハンドラを使用してメッセージを処理します。
+     *
+     * @param commandHandler 使用するコマンドハンドラ
+     * @param cm コマンドメッセージ
+     * @param pathVars パス変数
+     * @param commandReplyToken コマンド返信トークン
+     * @return 処理結果としての返信メッセージのリスト
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected List<Message> invoke(CommandHandler commandHandler, CommandMessage<?> cm, Map<String, String> pathVars, CommandReplyToken commandReplyToken) {
         return commandHandler.invokeMethod(new CommandHandlerArgs(cm, new PathVariables(pathVars), commandReplyToken));
     }
 
+    /**
+     * コマンドの処理中に例外が発生した場合の例外処理を行います。
+     *
+     * @param commandHandler コマンドハンドラ
+     * @param cause 発生した例外
+     * @param commandReplyToken コマンド返信トークン
+     */
     private void handleException(CommandHandler commandHandler,
             Throwable cause,
             CommandReplyToken commandReplyToken) {
