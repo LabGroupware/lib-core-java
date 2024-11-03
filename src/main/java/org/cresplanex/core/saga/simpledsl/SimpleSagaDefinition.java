@@ -37,6 +37,7 @@ public class SimpleSagaDefinition<Data>
         SagaStep<Data> currentStep = steps.get(state.getCurrentlyExecuting());
         boolean compensating = state.isCompensating();
 
+        // 以前のステップのリプライハンドラを呼び出す
         currentStep.getReplyHandler(message, compensating).ifPresent(handler -> invokeReplyHandler(message, sagaData, (d, m) -> {
             handler.accept(d, m);
             return null;

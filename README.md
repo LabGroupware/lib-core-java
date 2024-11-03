@@ -29,8 +29,6 @@ public class IdGeneratorConfiguration {
 core:
     outbox:
         # id: 1 # database id generatorを使用する場合に指定
-    database:
-        schema: core # 使用するデータベーススキーマ名
 ```
 
 #### Environment
@@ -201,8 +199,6 @@ core:
 @Import({
     // 実装
     CoreCommonJdbcOperationsConfiguration.class, // JDBCの実装
-    // Util
-    CoreIdGeneratorConfiguration.class, // IDGenerator
     // マッピング
     ChannelMappingDefaultConfiguration.class, // デフォルトのチャネルマッピング利用
 })
@@ -229,6 +225,7 @@ public class MessageProducerConfiguration {
 ```
 
 #### Dependency
+- [IdGeneratorConfiguration](#idgenerator)
 - JDBC利用の場合
   - [CoreCommonJdbcOperationsConfiguration](#corecommonjdbcoperations)
 

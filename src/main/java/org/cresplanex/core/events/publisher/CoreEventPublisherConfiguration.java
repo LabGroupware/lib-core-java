@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @Import({EventNameMappingDefaultConfiguration.class})
-public class CoreEventsPublisherConfiguration {
+public class CoreEventPublisherConfiguration {
 
     @Bean
     public DomainEventPublisher domainEventPublisher(MessageProducer messageProducer, DomainEventNameMapping domainEventNameMapping) {
