@@ -30,6 +30,17 @@ public class DomainEventHandlersBuilder {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
+    public <E extends DomainEvent> DomainEventHandlersBuilder onEvent(Class<E> eventClass, Consumer<DomainEventEnvelope<E>> handler, String eventTypeName) {
+        handlers.add(new DomainEventHandler(
+                aggregateType,
+                (Class<DomainEvent>) eventClass,
+                (e) -> handler.accept((DomainEventEnvelope<E>) e),
+                eventTypeName
+        ));
+        return this;
+    }
+
     public DomainEventHandlersBuilder andForAggregateType(String aggregateType) {
         this.aggregateType = aggregateType;
         return this;

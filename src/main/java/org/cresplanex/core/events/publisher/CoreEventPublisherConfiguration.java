@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Import;
 @Import({EventNameMappingDefaultConfiguration.class})
 public class CoreEventPublisherConfiguration {
 
-    @Bean
+    @Bean("org.cresplanex.core.events.publisher.DomainEventPublisher")
     public DomainEventPublisher domainEventPublisher(MessageProducer messageProducer, DomainEventNameMapping domainEventNameMapping) {
         return new DomainEventPublisherImpl(messageProducer, domainEventNameMapping);
     }

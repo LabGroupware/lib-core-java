@@ -15,6 +15,7 @@ public class DomainEventHandler {
     private final String aggregateType;
     private final Class<DomainEvent> eventClass;
     private final Consumer<DomainEventEnvelope<DomainEvent>> handler;
+    private final String eventTypeName;
 
     /**
      * 指定された集約タイプ、イベントクラス、およびハンドラで{@code DomainEventHandler}のインスタンスを生成します。
@@ -24,9 +25,14 @@ public class DomainEventHandler {
      * @param handler イベントを処理するためのハンドラ
      */
     public DomainEventHandler(String aggregateType, Class<DomainEvent> eventClass, Consumer<DomainEventEnvelope<DomainEvent>> handler) {
+        this(aggregateType, eventClass, handler, eventClass.getName());
+    }
+
+    public DomainEventHandler(String aggregateType, Class<DomainEvent> eventClass, Consumer<DomainEventEnvelope<DomainEvent>> handler, String eventTypeName) {
         this.aggregateType = aggregateType;
         this.eventClass = eventClass;
         this.handler = handler;
+        this.eventTypeName = eventTypeName;
     }
 
     /**
@@ -37,7 +43,7 @@ public class DomainEventHandler {
      */
     public boolean handles(Message message) {
         return aggregateType.equals(message.getRequiredHeader(EventMessageHeaders.AGGREGATE_TYPE))
-                && eventClass.getName().equals(message.getRequiredHeader(EventMessageHeaders.EVENT_TYPE));
+                && eventTypeName.equals(message.getRequiredHeader(EventMessageHeaders.EVENT_TYPE));
     }
 
     /**

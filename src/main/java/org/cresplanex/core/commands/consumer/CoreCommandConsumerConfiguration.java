@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Import;
 @Import({CommandReplyProducerConfiguration.class, CommandNameMappingDefaultConfiguration.class})
 public class CoreCommandConsumerConfiguration {
 
-    @Bean
+    @Bean("org.cresplanex.core.commands.consumer.CommandDispatcherFactory")
     public CommandDispatcherFactory commandDispatcherFactory(MessageConsumer messageConsumer, CommandNameMapping commandNameMapping, CommandReplyProducer commandReplyProducer) {
         return new CommandDispatcherFactory(messageConsumer, commandNameMapping, commandReplyProducer);
     }

@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
 @Import({ChannelMappingDefaultConfiguration.class})
 public class CoreCommandProducerConfiguration {
 
-    @Bean
+    @Bean("org.cresplanex.core.commands.producer.CommandProducer")
     public CommandProducer commandProducer(MessageProducer messageProducer, ChannelMapping channelMapping, CommandNameMapping commandNameMapping) {
         return new CommandProducerImpl(messageProducer, commandNameMapping);
     }

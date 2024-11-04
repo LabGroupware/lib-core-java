@@ -20,7 +20,7 @@ public class CoreKafkaConnectPropertiesConfiguration {
      * @param connectionValidationTimeout 接続の検証タイムアウト
      * @return Kafkaの設定
      */
-    @Bean
+    @Bean("org.cresplanex.core.common.kafka.property.CoreKafkaConnectProperties")
     public CoreKafkaConnectProperties coreKafkaConfigurationProperties(@Value("${core.kafka.bootstrap.servers}") String bootstrapServers,
             @Value("${core.kafka.connection.validation.timeout:#{1000}}") long connectionValidationTimeout) {
         return new CoreKafkaConnectProperties(bootstrapServers, connectionValidationTimeout);

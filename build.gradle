@@ -49,6 +49,9 @@ dependencies {
 	implementation 'org.postgresql:postgresql'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	implementation 'org.springframework.retry:spring-retry'
+	implementation 'org.apache.kafka:connect-api'
+	implementation 'org.apache.kafka:connect-transforms'
+	implementation 'org.apache.kafka:connect-json'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -61,4 +64,17 @@ tasks.withType(JavaCompile) {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+import org.apache.tools.ant.filters.ReplaceTokens
+processResources {
+	filesMatching('**/application.yaml') {
+		filter(
+				ReplaceTokens,
+				tokens: [
+						'applicationName': "${rootProject.name}".toString(),
+						'version': "${version}".toString(),
+				]
+		)
+	}
 }

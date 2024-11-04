@@ -24,7 +24,7 @@ public class OutboxPartitioningSpecConfiguration {
      * @param outboxTablePartitions
      * @return
      */
-    @Bean
+    @Bean("org.cresplanex.core.common.jdbc.OutboxPartitioningSpec")
     public OutboxPartitioningSpec outboxPartitioningSpec(@Value("${core.outbox.partitioning.outbox.tables:#{null}}") Integer outboxTables,
             @Value("${core.outbox.partitioning.message.partitions:#{null}}") Integer outboxTablePartitions) {
         return new OutboxPartitioningSpec(outboxTables, outboxTablePartitions);

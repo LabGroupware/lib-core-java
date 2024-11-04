@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CommandNameMappingDefaultConfiguration {
 
-    @Bean
+    @Bean("org.cresplanex.core.commands.common.CommandNameMapping")
     public CommandNameMapping commandNameMapping() {
         return new DefaultCommandNameMapping();
     }

@@ -26,7 +26,7 @@ public class CoreIdGeneratorConfiguration {
      *
      * @return アプリケーションID生成器のインスタンス
      */
-    @Bean
+    @Bean("org.cresplanex.core.common.id.IdGenerator")
     @Conditional(ApplicationIdGeneratorCondition.class)
     public IdGenerator applicationIdGenerator() {
         return new ApplicationIdGenerator();
@@ -43,7 +43,7 @@ public class CoreIdGeneratorConfiguration {
      * @param id データベース用のユニークID（"core.outbox.id" プロパティから取得）
      * @return データベースID生成器のインスタンス
      */
-    @Bean
+    @Bean("org.cresplanex.core.common.id.IdGenerator")
     @ConditionalOnProperty(name = "core.outbox.id")
     public IdGenerator databaseIdGenerator(@Value("${core.outbox.id:#{null}}") long id) {
         return new DatabaseIdGenerator(id);

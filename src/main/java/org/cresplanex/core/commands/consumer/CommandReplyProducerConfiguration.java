@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class CommandReplyProducerConfiguration {
-    @Bean
+    @Bean("org.cresplanex.core.commands.consumer.CommandReplyProducer")
     public CommandReplyProducer commandReplyProducer(MessageProducer messageProducer) {
         return new CommandReplyProducer(messageProducer);
     }

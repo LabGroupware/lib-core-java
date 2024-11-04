@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Import;
 @Import({EventNameMappingDefaultConfiguration.class})
 public class CoreEventSubscriberConfiguration {
 
-    @Bean
+    @Bean("org.cresplanex.core.events.subscriber.DomainEventDispatcherFactory")
     public DomainEventDispatcherFactory domainEventDispatcherFactory(MessageConsumer messageConsumer, DomainEventNameMapping domainEventNameMapping) {
         return new DomainEventDispatcherFactory(messageConsumer, domainEventNameMapping);
     }

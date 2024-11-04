@@ -66,7 +66,7 @@ public class DomainEventDispatcher {
         // メッセージに対応するハンドラを取得
         Optional<DomainEventHandler> handler = domainEventHandlers.findTargetMethod(message);
 
-        if (!handler.isPresent()) {
+        if (handler.isEmpty()) {
             return; // 対応するハンドラがない場合は何もせずに終了
         }
 

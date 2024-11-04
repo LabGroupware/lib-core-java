@@ -23,7 +23,7 @@ public class CoreSchemaConfiguration {
      * @param coreDatabaseSchema データベーススキーマ名（アプリケーション設定から取得）
      * @return CoreSchemaのインスタンス
      */
-    @Bean
+    @Bean("org.cresplanex.core.common.jdbc.CoreSchema")
     public CoreSchema coreSchema(@Value("${core.database.schema:#{null}}") String coreDatabaseSchema) {
         return new CoreSchema(coreDatabaseSchema);
     }

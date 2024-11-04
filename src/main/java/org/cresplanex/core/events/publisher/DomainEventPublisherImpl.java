@@ -33,6 +33,11 @@ public class DomainEventPublisherImpl implements DomainEventPublisher {
     }
 
     @Override
+    public void publish(String aggregateType, Object aggregateId, List<DomainEvent> domainEvents, String eventTypeName) {
+        publish(aggregateType, aggregateId, Collections.emptyMap(), domainEvents, eventTypeName);
+    }
+
+    @Override
     public void publish(String aggregateType,
             Object aggregateId,
             Map<String, String> headers,
@@ -42,6 +47,20 @@ public class DomainEventPublisherImpl implements DomainEventPublisher {
             messageProducer.send(aggregateType,
                     EventUtil.makeMessageForDomainEvent(aggregateType, aggregateId, headers, event,
                             domainEventNameMapping.eventToExternalEventType(aggregateType, event)));
+        }
+    }
+
+    @Override
+    public void publish(String aggregateType,
+            Object aggregateId,
+            Map<String, String> headers,
+            List<DomainEvent> domainEvents,
+            String eventTypeName) {
+
+        for (DomainEvent event : domainEvents) {
+            messageProducer.send(aggregateType,
+                    EventUtil.makeMessageForDomainEvent(aggregateType, aggregateId, headers, event,
+                            domainEventNameMapping.eventToExternalEventType(aggregateType, event, eventTypeName)));
         }
     }
 }

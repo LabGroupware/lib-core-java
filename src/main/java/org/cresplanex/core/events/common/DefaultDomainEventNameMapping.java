@@ -13,8 +13,13 @@ public class DefaultDomainEventNameMapping implements DomainEventNameMapping {
      * @return ドメインイベントのクラス名を表す外部イベントタイプ
      */
     @Override
+    public String eventToExternalEventType(String aggregateType, DomainEvent event, String eventTypeName) {
+        return eventTypeName;
+    }
+
+    @Override
     public String eventToExternalEventType(String aggregateType, DomainEvent event) {
-        return event.getClass().getName();
+        return eventToExternalEventType(aggregateType, event, event.getClass().getName());
     }
 
     /**

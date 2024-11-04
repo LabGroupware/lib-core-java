@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: core
+app:
+  name: @applicationName@
+  version: @version@

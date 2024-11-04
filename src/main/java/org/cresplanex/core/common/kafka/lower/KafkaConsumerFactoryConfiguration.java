@@ -18,7 +18,7 @@ public class KafkaConsumerFactoryConfiguration {
      *
      * @return Kafkaコンシューマーファクトリーのインスタンス
      */
-    @Bean
+    @Bean("org.cresplanex.core.common.kafka.lower.KafkaConsumerFactory")
     public KafkaConsumerFactory kafkaConsumerFactory() {
         return new DefaultKafkaConsumerFactory();
     }

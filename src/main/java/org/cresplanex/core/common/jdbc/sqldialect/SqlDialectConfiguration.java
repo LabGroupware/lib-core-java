@@ -18,7 +18,7 @@ public class SqlDialectConfiguration {
      *
      * @return MySQL用のSQL方言Bean
      */
-    @Bean
+    @Bean("org.cresplanex.core.common.jdbc.sqldialect.MySqlDialect")
     public MySqlDialect mySqlDialect() {
         return new MySqlDialect();
     }
@@ -28,7 +28,7 @@ public class SqlDialectConfiguration {
      *
      * @return PostgreSQL用のSQL方言Bean
      */
-    @Bean
+    @Bean("org.cresplanex.core.common.jdbc.sqldialect.PostgresDialect")
     public PostgresDialect postgreSQLDialect() {
         return new PostgresDialect();
     }
@@ -38,7 +38,7 @@ public class SqlDialectConfiguration {
      *
      * @return SQL Server用のSQL方言Bean
      */
-    @Bean
+    @Bean("org.cresplanex.core.common.jdbc.sqldialect.MsSqlDialect")
     public MsSqlDialect msSqlDialect() {
         return new MsSqlDialect();
     }
@@ -49,7 +49,7 @@ public class SqlDialectConfiguration {
      * @param customCurrentTimeInMillisecondsExpression
      * @return
      */
-    @Bean
+    @Bean("org.cresplanex.core.common.jdbc.sqldialect.DefaultCoreSqlDialect")
     public DefaultCoreSqlDialect defaultSqlDialect(@Value("${core.current.time.in.milliseconds.sql:#{null}}") String customCurrentTimeInMillisecondsExpression) {
         return new DefaultCoreSqlDialect(customCurrentTimeInMillisecondsExpression);
     }

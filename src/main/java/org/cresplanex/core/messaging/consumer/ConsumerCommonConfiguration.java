@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Import;
 @Import({BuiltInMessageHandlerDecoratorConfiguration.class, ChannelMappingDefaultConfiguration.class, SubscriberMappingDefaultConfiguration.class})
 public class ConsumerCommonConfiguration {
 
-    @Bean
+    @Bean("org.cresplanex.core.messaging.consumer.MessageConsumer")
     public MessageConsumer messageConsumer(MessageConsumerImplementation messageConsumerImplementation,
             ChannelMapping channelMapping,
             DecoratedMessageHandlerFactory decoratedMessageHandlerFactory, SubscriberMapping subscriberMapping) {

@@ -20,7 +20,7 @@ public class CoreKafkaConsumerSpringPropertiesConfiguration {
      * Springから注入されたKafkaコンシューマー構成プロパティ
      * @return CoreKafkaConsumerConfigurationPropertiesのインスタンス
      */
-    @Bean
+    @Bean("org.cresplanex.core.common.kafka.property.CoreKafkaConsumerProperties")
     public CoreKafkaConsumerProperties coreKafkaConsumerProperties(
             CoreKafkaConsumerSpringProperties coreKafkaConsumerSpringConfigurationProperties) {
 

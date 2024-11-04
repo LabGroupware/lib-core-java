@@ -18,7 +18,7 @@ public class OptimisticLockingDecoratorConfiguration {
      *
      * @return OptimisticLockingDecoratorインスタンス
      */
-    @Bean
+    @Bean("org.cresplanex.core.messaging.consumer.decorator.OptimisticLockingDecorator")
     public OptimisticLockingDecorator optimisticLockingDecorator() {
         return new OptimisticLockingDecorator();
     }

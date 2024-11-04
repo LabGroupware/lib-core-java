@@ -45,8 +45,16 @@ public class MessageConsumerKafkaImplementation implements MessageConsumerImplem
     public MessageSubscription subscribe(String subscriberId, Set<String> channels, MessageHandler handler) {
         logger.info("Subscribing: subscriberId = {}, channels = {}", subscriberId, channels);
 
+//        KafkaSubscription subscription = messageConsumerKafka.subscribe(subscriberId,
+//                channels, message -> handler.accept(message.getPayloadContent()));
+
         KafkaSubscription subscription = messageConsumerKafka.subscribe(subscriberId,
-                channels, message -> handler.accept(JSonMapper.fromJson(message.getPayload(), MessageImpl.class)));
+                channels, message -> {
+                    logger.info("Received message: {}", message);
+                    MessageImpl messageImpl = message.getPayloadContent();
+                    logger.info("Received message: {}", messageImpl);
+                    handler.accept(messageImpl);
+                });
 
         logger.info("Subscribed: subscriberId = {}, channels = {}", subscriberId, channels);
 

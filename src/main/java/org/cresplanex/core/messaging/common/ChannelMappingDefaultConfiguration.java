@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 public class ChannelMappingDefaultConfiguration {
 
     // デフォルトのチャネルマッピングを提供する
-    @Bean
+    @Bean("org.cresplanex.core.messaging.common.ChannelMapping")
     public ChannelMapping channelMappingDefault() {
         return new DefaultChannelMapping.DefaultChannelMappingBuilder().build();
     }

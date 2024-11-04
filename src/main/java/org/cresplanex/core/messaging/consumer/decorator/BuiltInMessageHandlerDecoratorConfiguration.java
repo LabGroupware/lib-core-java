@@ -26,7 +26,7 @@ public class BuiltInMessageHandlerDecoratorConfiguration {
      * @param decorators メッセージハンドラデコレータのリスト
      * @return DecoratedMessageHandlerFactory インスタンス
      */
-    @Bean
+    @Bean("org.cresplanex.core.messaging.consumer.decorator.DecoratedMessageHandlerFactory")
     public DecoratedMessageHandlerFactory subscribedMessageHandlerChainFactory(List<MessageHandlerDecorator> decorators) {
         return new DecoratedMessageHandlerFactory(decorators);
     }
@@ -36,7 +36,7 @@ public class BuiltInMessageHandlerDecoratorConfiguration {
      *
      * @return PrePostReceiveMessageHandlerDecorator インスタンス
      */
-    @Bean
+    @Bean("org.cresplanex.core.messaging.consumer.decorator.PrePostReceiveMessageHandlerDecorator")
     public PrePostReceiveMessageHandlerDecorator prePostReceiveMessageHandlerDecoratorDecorator() {
         return new PrePostReceiveMessageHandlerDecorator(messageInterceptors);
     }
@@ -47,7 +47,7 @@ public class BuiltInMessageHandlerDecoratorConfiguration {
      * @param duplicateMessageDetector 重複メッセージ検出機能を持つインスタンス
      * @return DuplicateDetectingMessageHandlerDecorator インスタンス
      */
-    @Bean
+    @Bean("org.cresplanex.core.messaging.consumer.decorator.DuplicateDetectingMessageHandlerDecorator")
     public DuplicateDetectingMessageHandlerDecorator duplicateDetectingMessageHandlerDecorator(DuplicateMessageDetector duplicateMessageDetector) {
         return new DuplicateDetectingMessageHandlerDecorator(duplicateMessageDetector);
     }
@@ -57,7 +57,7 @@ public class BuiltInMessageHandlerDecoratorConfiguration {
      *
      * @return PrePostHandlerMessageHandlerDecorator インスタンス
      */
-    @Bean
+    @Bean("org.cresplanex.core.messaging.consumer.decorator.PrePostHandlerMessageHandlerDecorator")
     public PrePostHandlerMessageHandlerDecorator prePostHandlerMessageHandlerDecorator() {
         return new PrePostHandlerMessageHandlerDecorator(messageInterceptors);
     }

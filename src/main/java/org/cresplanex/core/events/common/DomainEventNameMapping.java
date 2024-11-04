@@ -12,6 +12,8 @@ public interface DomainEventNameMapping {
      * @param event ドメインイベント
      * @return 外部イベントタイプの文字列
      */
+    String eventToExternalEventType(String aggregateType, DomainEvent event, String eventTypeName);
+
     String eventToExternalEventType(String aggregateType, DomainEvent event);
 
     /**
