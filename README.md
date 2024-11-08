@@ -1,8 +1,15 @@
 # Core For Microservice Java
 
 ## Quick Start
+
+maven central
 ``` sh
-./gradlew publish
+ ./gradlew clean sonatypeCentralUpload
+```
+
+local
+``` sh
+./gradlew clean publish
 ```
 
 ## UseCase
