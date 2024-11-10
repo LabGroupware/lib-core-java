@@ -10,12 +10,20 @@ import org.cresplanex.core.messaging.common.MessageBuilder;
 
 public class CommandHandlerReplyBuilder {
 
-    private static <T> Message with(T reply, CommandReplyOutcome outcome) {
+    private static <T> Message with(T reply, String replyType, CommandReplyOutcome outcome) {
         MessageBuilder messageBuilder = MessageBuilder
                 .withPayload(JSonMapper.toJson(reply))
                 .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, outcome.name())
-                .withHeader(ReplyMessageHeaders.REPLY_TYPE, reply.getClass().getName());
+                .withHeader(ReplyMessageHeaders.REPLY_TYPE, replyType);
         return messageBuilder.build();
+    }
+
+    private static <T> Message with(T reply, CommandReplyOutcome outcome) {
+        return with(reply, reply.getClass().getName(), outcome);
+    }
+
+    public static Message withSuccess(Object reply, String replyType) {
+        return with(reply, replyType, CommandReplyOutcome.SUCCESS);
     }
 
     public static Message withSuccess(Object reply) {
@@ -23,11 +31,15 @@ public class CommandHandlerReplyBuilder {
     }
 
     public static Message withSuccess() {
-        return withSuccess(new Success());
+        return withSuccess(new Success(), Success.TYPE);
+    }
+
+    public static Message withFailure(Object reply, String replyType) {
+        return with(reply, replyType, CommandReplyOutcome.FAILURE);
     }
 
     public static Message withFailure() {
-        return withFailure(new Failure());
+        return withFailure(new Failure(), Failure.TYPE);
     }
 
     public static Message withFailure(Object reply) {

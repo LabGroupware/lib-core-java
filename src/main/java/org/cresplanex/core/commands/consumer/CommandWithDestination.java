@@ -14,6 +14,7 @@ public class CommandWithDestination {
     private final String destinationChannel;
     private final String resource;
     private final Command command;
+    private final String commandType;
     private final Map<String, String> extraHeaders;
 
     /**
@@ -25,10 +26,24 @@ public class CommandWithDestination {
      * @param extraHeaders 追加のヘッダー
      */
     public CommandWithDestination(String destinationChannel, String resource, Command command, Map<String, String> extraHeaders) {
+        this(destinationChannel, resource, command, extraHeaders, null);
+    }
+
+    /**
+     * 指定されたパラメータで新しいインスタンスを作成します。
+     *
+     * @param destinationChannel 宛先チャネル
+     * @param resource リソースパス
+     * @param command 実行するコマンド
+     * @param extraHeaders 追加のヘッダー
+     * @param commandType コマンドタイプ
+     */
+    public CommandWithDestination(String destinationChannel, String resource, Command command, Map<String, String> extraHeaders, String commandType) {
         this.destinationChannel = destinationChannel;
         this.resource = resource;
         this.command = command;
         this.extraHeaders = extraHeaders;
+        this.commandType = commandType;
     }
 
     /**
@@ -40,6 +55,18 @@ public class CommandWithDestination {
      */
     public CommandWithDestination(String destinationChannel, String resource, Command command) {
         this(destinationChannel, resource, command, Collections.emptyMap());
+    }
+
+    /**
+     * 宛先チャネルとリソース、およびコマンドのみで新しいインスタンスを作成します。
+     *
+     * @param destinationChannel 宛先チャネル
+     * @param resource リソースパス
+     * @param command 実行するコマンド
+     * @param commandType コマンドタイプ
+     */
+    public CommandWithDestination(String destinationChannel, String resource, Command command, String commandType) {
+        this(destinationChannel, resource, command, Collections.emptyMap(), commandType);
     }
 
     @Override
@@ -72,6 +99,15 @@ public class CommandWithDestination {
      */
     public Command getCommand() {
         return command;
+    }
+
+    /**
+     * コマンドタイプを取得します。
+     *
+     * @return コマンドタイプ
+     */
+    public String getCommandType() {
+        return commandType;
     }
 
     /**

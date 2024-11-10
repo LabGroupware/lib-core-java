@@ -44,8 +44,8 @@
  * 具体的な実装は{@link ParticipantInvocationImpl}や
  * {@link ParticipantEndpointInvocationImpl}が行い, 応答の成功判定は同じ処理であるが,
  * コマンドの生成方法が異なります。
- * {@link ParticipantInvocationImpl}は、実行条件の他にコマンドを作成する関数と通知の有無を保持します。
- * {@link ParticipantEndpointInvocationImpl}は、参加者エンドポイントのインボケーションを実行するクラスの実装で,
+ * {@link org.cresplanex.core.saga.simpledsl.ParticipantInvocationImpl}は、実行条件の他にコマンドを作成する関数と通知の有無を保持します。
+ * {@link org.cresplanex.core.saga.simpledsl.ParticipantEndpointInvocationImpl}は、参加者エンドポイントのインボケーションを実行するクラスの実装で,
  * 実行条件の他にコマンドエンドポイントとコマンドプロバイダを保持します。直接{@link CommandWithDestination}
  * のビルダを指定する{@link ParticipantInvocationImpl}とは異なり,
  * コマンドエンドポイントと{@link Command}のみのビルダ(Provider)を指定します。

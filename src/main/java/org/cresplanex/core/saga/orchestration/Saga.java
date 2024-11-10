@@ -24,6 +24,13 @@ public interface Saga<Data> {
     }
 
     /**
+     * サガのコマンドチャンネルを取得します。
+     *
+     * @return サガのコマンドチャンネル
+     */
+    String getSagaCommandSelfChannel();
+
+    /**
      * サガ開始時に実行される処理。サガIDとデータを受け取ります。
      *
      * @param sagaId サガID

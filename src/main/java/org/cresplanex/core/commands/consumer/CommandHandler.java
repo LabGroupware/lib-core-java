@@ -28,4 +28,12 @@ public class CommandHandler extends AbstractCommandHandler<List<Message>> {
 
         super(channel, resource, commandClass, handler);
     }
+
+    public <C extends Command> CommandHandler(String channel, Optional<String> resource,
+            Class<C> commandClass,
+            Function<CommandHandlerArgs<C>, List<Message>> handler,
+            String commandType) {
+
+        super(channel, resource, commandClass, handler, commandType);
+    }
 }

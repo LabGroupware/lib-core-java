@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * サーガデータのシリアル化とデシリアル化を行うユーティリティクラス。
+ *
+ * これらは, Serviceをまたいで使用することはなく, SagaInstanceテーブルに保存されるデータをシリアライズするために使用されます。
+ * そのため, クラス名を使用することも可能.
  */
 public class SagaDataSerde {
 

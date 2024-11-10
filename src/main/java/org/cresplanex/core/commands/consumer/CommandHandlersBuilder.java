@@ -67,6 +67,12 @@ public class CommandHandlersBuilder {
         return this;
     }
 
+    public <C extends Command> CommandHandlersBuilder onMessageReturningMessages(Class<C> commandClass,
+            String commandType, BiFunction<CommandMessage<C>, PathVariables, List<Message>> handler) {
+        this.handlers.add(new CommandHandler(channel, resource, commandClass, CommandHandlerArgs.makeFn(handler), commandType));
+        return this;
+    }
+
     /**
      * 指定されたクラスのコマンドを受信し、オプションで単一のメッセージを返すハンドラを設定します。
      *
@@ -79,6 +85,13 @@ public class CommandHandlersBuilder {
             BiFunction<CommandMessage<C>, PathVariables, Optional<Message>> handler) {
         this.handlers.add(new CommandHandler(channel, resource, commandClass,
                 args -> handler.apply(args.getCommandMessage(), args.getPathVars()).map(Collections::singletonList).orElse(Collections.emptyList())));
+        return this;
+    }
+
+    public <C extends Command> CommandHandlersBuilder onMessageReturningOptionalMessage(Class<C> commandClass,
+            String commandType, BiFunction<CommandMessage<C>, PathVariables, Optional<Message>> handler) {
+        this.handlers.add(new CommandHandler(channel, resource, commandClass,
+                args -> handler.apply(args.getCommandMessage(), args.getPathVars()).map(Collections::singletonList).orElse(Collections.emptyList()), commandType));
         return this;
     }
 
@@ -96,6 +109,12 @@ public class CommandHandlersBuilder {
         return this;
     }
 
+    public <C extends Command> CommandHandlersBuilder onMessage(Class<C> commandClass,
+            String commandType, BiFunction<CommandMessage<C>, PathVariables, Message> handler) {
+        this.handlers.add(new CommandHandler(channel, resource, commandClass, args -> Collections.singletonList(handler.apply(args.getCommandMessage(), args.getPathVars())), commandType));
+        return this;
+    }
+
     /**
      * コマンドメッセージを受け取って複数のメッセージを返すハンドラを設定します。
      *
@@ -107,6 +126,12 @@ public class CommandHandlersBuilder {
     public <C extends Command> CommandHandlersBuilder onMessageReturningMessages(Class<C> commandClass,
             Function<CommandMessage<C>, List<Message>> handler) {
         this.handlers.add(new CommandHandler(channel, resource, commandClass, args -> handler.apply(args.getCommandMessage())));
+        return this;
+    }
+
+    public <C extends Command> CommandHandlersBuilder onMessageReturningMessages(Class<C> commandClass,
+            String commandType, Function<CommandMessage<C>, List<Message>> handler) {
+        this.handlers.add(new CommandHandler(channel, resource, commandClass, args -> handler.apply(args.getCommandMessage()), commandType));
         return this;
     }
 
@@ -125,6 +150,13 @@ public class CommandHandlersBuilder {
         return this;
     }
 
+    public <C extends Command> CommandHandlersBuilder onMessageReturningOptionalMessage(Class<C> commandClass,
+            String commandType, Function<CommandMessage<C>, Optional<Message>> handler) {
+        this.handlers.add(new CommandHandler(channel, resource, commandClass,
+                args -> handler.apply(args.getCommandMessage()).map(Collections::singletonList).orElse(Collections.emptyList()), commandType));
+        return this;
+    }
+
     /**
      * コマンドメッセージを受け取って単一のメッセージを返すハンドラを設定します。
      *
@@ -139,6 +171,12 @@ public class CommandHandlersBuilder {
         return this;
     }
 
+    public <C extends Command> CommandHandlersBuilder onMessage(Class<C> commandClass,
+            String commandType, Function<CommandMessage<C>, Message> handler) {
+        this.handlers.add(new CommandHandler(channel, resource, commandClass, args -> Collections.singletonList(handler.apply(args.getCommandMessage())), commandType));
+        return this;
+    }
+
     /**
      * コマンドメッセージを受け取り、コマンド返信トークンを利用して複雑な処理を行うハンドラを設定します。
      *
@@ -150,6 +188,12 @@ public class CommandHandlersBuilder {
     public <C extends Command> CommandHandlersBuilder onComplexMessage(Class<C> commandClass,
             BiConsumer<CommandMessage<C>, CommandReplyToken> handler) {
         this.handlers.add(new CommandHandler(channel, resource, commandClass, makeFn(handler)));
+        return this;
+    }
+
+    public <C extends Command> CommandHandlersBuilder onComplexMessage(Class<C> commandClass,
+            String commandType, BiConsumer<CommandMessage<C>, CommandReplyToken> handler) {
+        this.handlers.add(new CommandHandler(channel, resource, commandClass, makeFn(handler), commandType));
         return this;
     }
 
@@ -169,6 +213,15 @@ public class CommandHandlersBuilder {
             handler.accept(args.getCommandMessage());
             return Collections.emptyList();
         }));
+        return this;
+    }
+
+    public <C extends Command> CommandHandlersBuilder onMessage(Class<C> commandClass,
+            String commandType, Consumer<CommandMessage<C>> handler) {
+        this.handlers.add(new CommandHandler(channel, resource, commandClass, args -> {
+            handler.accept(args.getCommandMessage());
+            return Collections.emptyList();
+        }, commandType));
         return this;
     }
 

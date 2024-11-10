@@ -118,19 +118,20 @@ public abstract class AbstractSimpleSagaDefinition<Data, Step extends ISagaStep<
      * @param <T> ハンドラの戻り値の型
      * @return ハンドラの実行結果
      */
-    protected <T> T invokeReplyHandler(Message message, Data data, BiFunction<Data, Object, T> handler) {
-        Class<?> m;
-        try {
-            // リプライタイプよりクラスを取得
-            String className = message.getRequiredHeader(ReplyMessageHeaders.REPLY_TYPE);
-            // クラスをロード
-            m = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
-        } catch (ClassNotFoundException e) {
-            logger.error("Class not found", e);
-            throw new RuntimeException("Class not found", e);
-        }
+    protected <T> T invokeReplyHandler(Message message, Data data, BiFunction<Data, Object, T> handler, Class<?> replyClass) {
+//        Class<?> m;
+//        try {
+//            // リプライタイプよりクラスを取得
+//            String className = message.getRequiredHeader(ReplyMessageHeaders.REPLY_TYPE);
+//            // クラスをロード
+//            // TODO: 異なる言語やパッケージでのエラーを防ぐための処置が必要
+//            m = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
+//        } catch (ClassNotFoundException e) {
+//            logger.error("Class not found", e);
+//            throw new RuntimeException("Class not found", e);
+//        }
         // リプライをデシリアライズ
-        Object reply = JSonMapper.fromJson(message.getPayload(), m);
+        Object reply = JSonMapper.fromJson(message.getPayload(), replyClass);
         // ハンドラを実行
         return handler.apply(data, reply);
     }

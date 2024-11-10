@@ -14,36 +14,23 @@ import org.cresplanex.core.messaging.common.MessageBuilder;
  */
 public class CommandMessageFactory {
 
-    /**
-     * コマンドメッセージを作成します。
-     *
-     * @param commandNameMapping
-     * @param channel
-     * @param command
-     * @param replyTo
-     * @param headers
-     * @return
-     */
     public static Message makeMessage(CommandNameMapping commandNameMapping, String channel, Command command, String replyTo, Map<String, String> headers) {
         return makeMessage(commandNameMapping, channel, null, command, replyTo, headers);
     }
 
-    /**
-     * コマンドメッセージを作成します。
-     * 
-     * @param commandNameMapping
-     * @param channel
-     * @param resource
-     * @param command
-     * @param replyTo
-     * @param headers
-     * @return
-     */
+    public static Message makeMessage(String channel, Command command, String replyTo, Map<String, String> headers, String commandType) {
+        return makeMessage(channel, null, command, replyTo, headers, commandType);
+    }
+
     public static Message makeMessage(CommandNameMapping commandNameMapping, String channel, String resource, Command command, String replyTo, Map<String, String> headers) {
+        return makeMessage(channel, resource, command, replyTo, headers, commandNameMapping.commandToExternalCommandType(command));
+    }
+
+    public static Message makeMessage(String channel, String resource, Command command, String replyTo, Map<String, String> headers, String commandType) {
         MessageBuilder builder = MessageBuilder.withPayload(JSonMapper.toJson(command))
                 .withExtraHeaders("", headers) // TODO should these be prefixed??!
                 .withHeader(CommandMessageHeaders.DESTINATION, channel)
-                .withHeader(CommandMessageHeaders.COMMAND_TYPE, commandNameMapping.commandToExternalCommandType(command));
+                .withHeader(CommandMessageHeaders.COMMAND_TYPE, commandType);
 
         if (replyTo != null) {
             builder.withHeader(CommandMessageHeaders.REPLY_TO, replyTo);

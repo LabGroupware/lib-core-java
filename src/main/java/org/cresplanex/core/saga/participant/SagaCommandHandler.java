@@ -37,6 +37,18 @@ public class SagaCommandHandler extends CommandHandler {
     }
 
     /**
+     * SagaCommandHandlerのコンストラクタ。
+     *
+     * @param <C> コマンドの型
+     * @param channel コマンドが送信されるチャンネル
+     * @param commandClass コマンドのクラス型
+     * @param handler コマンドの処理を行う関数
+     */
+    public <C extends Command> SagaCommandHandler(String channel, Class<C> commandClass, String commandType, Function<CommandHandlerArgs<C>, List<Message>> handler) {
+        super(channel, Optional.empty(), commandClass, handler, commandType);
+    }
+
+    /**
      * 事前ロック処理を設定します。コマンドメッセージとパス変数を基にロック対象を決定します。
      *
      * @param preLock コマンドメッセージとパス変数を受け取り、ロック対象を返す関数

@@ -20,6 +20,7 @@ import org.cresplanex.core.saga.common.SagaReplyHeaders;
 import org.cresplanex.core.saga.lock.LockTarget;
 import org.cresplanex.core.saga.lock.SagaLockManager;
 import org.cresplanex.core.saga.lock.SagaUnlockCommand;
+import org.cresplanex.core.saga.lock.TargetConflictOnSagaStartException;
 import org.cresplanex.core.saga.orchestration.command.SagaCommandProducer;
 import org.cresplanex.core.saga.orchestration.repository.SagaInstance;
 import org.cresplanex.core.saga.orchestration.repository.SagaInstanceRepository;
@@ -92,8 +93,8 @@ public class SagaManagerImpl<Data>
     }
 
     @Override
-    public SagaInstance create(Data data, Class<?> targetClass, Object targetId) {
-        return create(data, Optional.of(new LockTarget(targetClass, targetId).getTarget()));
+    public SagaInstance create(Data data, String targetType, String targetId) {
+        return create(data, Optional.of(new LockTarget(targetType, targetId).getTarget()));
     }
 
     /**
@@ -124,16 +125,27 @@ public class SagaManagerImpl<Data>
         saga.onStarting(sagaId, sagaData);
 
         // ロックが必要な場合はロックを獲得
+        // この時スタッシュをしない理由としては,
+        // 1. まだSagaが開始されていないため, 補償処理が必要ない
+        // 2. 例えば, あるTargetに対するUpdateSaga処理中に, そのTargetに対する別のUpdateSagaが来た場合,
+        // 反映されてない状況での判断による誤った操作である可能性が高いため.
         resource.ifPresent(r -> {
+            // 例えば, IDがデータベース生成であった場合に, 事前に作成をしておき,
+            // そこからSagaを開始させたい場合などのユースケース.
+            // 他の場合は, withLockを使って, ロックする
             if (!sagaLockManager.claimLock(getSagaType(), sagaId, r)) {
-                throw new RuntimeException("Cannot claim lock for resource");
+                throw new TargetConflictOnSagaStartException("Failed to claim lock for resource: " + r);
             }
+            // 最後に解放を行うため
+            sagaInstance.addDestinationsAndResources(singleton(
+                    new DestinationAndResource(getSagaCommandSelfChannel(), r)));
         });
 
         // サーガの開始アクションを取得
         SagaActions<Data> actions = getStateDefinition().start(sagaData);
         // ローカル例外がある場合は, その例外を投げる
         actions.getLocalException().ifPresent(e -> {
+            performEndStateActions(sagaId, sagaInstance, false, true, sagaData);
             throw e;
         });
 
@@ -157,7 +169,7 @@ public class SagaManagerImpl<Data>
             // saga情報をヘッダに追加
             headers.put(SagaCommandHeaders.SAGA_ID, sagaId);
             headers.put(SagaCommandHeaders.SAGA_TYPE, getSagaType());
-            commandProducer.send(dr.getDestination(), dr.getResource(), new SagaUnlockCommand(), makeSagaReplyChannel(), headers);
+            commandProducer.send(dr.getDestination(), dr.getResource(), new SagaUnlockCommand(), SagaUnlockCommand.TYPE, makeSagaReplyChannel(), headers);
         }
 
         if (failed) {
@@ -183,6 +195,10 @@ public class SagaManagerImpl<Data>
 
     private String getSagaType() {
         return saga.getSagaType();
+    }
+
+    private String getSagaCommandSelfChannel() {
+        return saga.getSagaCommandSelfChannel();
     }
 
     /**
@@ -233,20 +249,16 @@ public class SagaManagerImpl<Data>
         Data sagaData = SagaDataSerde.deserializeSagaData(sagaInstance.getSerializedSagaData());
 
         message.getHeader(SagaReplyHeaders.REPLY_LOCKED).ifPresent(lockedTarget -> {
+            // 最後にアンロックするためにDestinationAndResourceを追加
             String destination = message.getRequiredHeader(CommandMessageHeaders.inReply(CommandMessageHeaders.DESTINATION));
             sagaInstance.addDestinationsAndResources(singleton(new DestinationAndResource(destination, lockedTarget)));
         });
 
         String currentState = sagaInstance.getStateName();
 
-        logger.info("Current state={}", currentState);
-
         SagaActions<Data> actions = getStateDefinition().handleReply(sagaType, sagaId, currentState, sagaData, message);
 
-        logger.info("Handled reply. Sending commands {}", actions.getCommands());
-
         processActions(sagaType, sagaId, sagaInstance, sagaData, actions);
-
     }
 
     /**
@@ -269,7 +281,7 @@ public class SagaManagerImpl<Data>
                 actions = getStateDefinition().handleReply(sagaType, sagaId, actions.getUpdatedState().get(), actions.getUpdatedSagaData().get(), MessageBuilder
                         .withPayload("{}")
                         .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, CommandReplyOutcome.FAILURE.name())
-                        .withHeader(ReplyMessageHeaders.REPLY_TYPE, Failure.class.getName())
+                        .withHeader(ReplyMessageHeaders.REPLY_TYPE, Failure.TYPE)
                         .build());
 
             } else {
@@ -310,16 +322,16 @@ public class SagaManagerImpl<Data>
      * localStepの場合はもとより, onReplyの登録はできず, notificationの場合も必要としないため, このメソッドが呼ばれる。
      * ただし, あくまで成功メッセージなので、補償トランザクションの開始は行われないようにisSuccessfulReplyなどを実装する必要がある。
      *
-     * @param sagaType
-     * @param sagaId
-     * @param actions
-     * @return
+     * @param sagaType サーガタイプ
+     * @param sagaId サーガID
+     * @param actions 実行するアクション
+     * @return 次のアクション
      */
     private SagaActions<Data> simulateSuccessfulReplyToLocalActionOrNotification(String sagaType, String sagaId, SagaActions<Data> actions) {
         return getStateDefinition().handleReply(sagaType, sagaId, actions.getUpdatedState().get(), actions.getUpdatedSagaData().get(), MessageBuilder
                 .withPayload("{}")
                 .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, CommandReplyOutcome.SUCCESS.name())
-                .withHeader(ReplyMessageHeaders.REPLY_TYPE, Success.class.getName())
+                .withHeader(ReplyMessageHeaders.REPLY_TYPE, Success.TYPE)
                 .build());
     }
 

@@ -12,6 +12,7 @@ import org.cresplanex.core.commands.common.paths.ResourcePathPattern;
 public class CommandWithDestinationBuilder {
 
     private final Command command;
+    private String commandType;
     private String destinationChannel;
     private String resource;
     private Map<String, String> extraHeaders = Collections.emptyMap();
@@ -47,6 +48,17 @@ public class CommandWithDestinationBuilder {
     }
 
     /**
+     * コマンドタイプを設定します。
+     *
+     * @param commandType コマンドタイプ
+     * @return ビルダー自身を返し、メソッドチェーンを可能にします
+     */
+    public CommandWithDestinationBuilder ofType(String commandType) {
+        this.commandType = commandType;
+        return this;
+    }
+
+    /**
      * リソースとパスパラメータを設定します。
      *
      * @param resource リソースのパスパターン
@@ -75,6 +87,6 @@ public class CommandWithDestinationBuilder {
      * @return 設定されたプロパティを持つ `CommandWithDestination`
      */
     public CommandWithDestination build() {
-        return new CommandWithDestination(destinationChannel, resource, command, extraHeaders);
+        return new CommandWithDestination(destinationChannel, resource, command, extraHeaders, commandType);
     }
 }

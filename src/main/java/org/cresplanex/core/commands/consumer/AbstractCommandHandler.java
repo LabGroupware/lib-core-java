@@ -19,6 +19,7 @@ public class AbstractCommandHandler<RESULT> {
     private final String channel;
     private final Optional<String> resource;
     private final Class<? extends Command> commandClass;
+    private final String commandType;
     private final Function<CommandHandlerArgs<Command>, RESULT> handler;
 
     /**
@@ -34,9 +35,27 @@ public class AbstractCommandHandler<RESULT> {
     public <C extends Command> AbstractCommandHandler(String channel, Optional<String> resource,
             Class<C> commandClass,
             Function<CommandHandlerArgs<C>, RESULT> handler) {
+        this(channel, resource, commandClass, handler, commandClass.getName());
+    }
+
+    /**
+     * AbstractCommandHandlerのコンストラクタ。
+     *
+     * @param channel チャンネル名
+     * @param resource リソースパス（オプション）
+     * @param commandClass コマンドのクラス型
+     * @param handler コマンド処理を行う関数
+     * @param <C> コマンドの型
+     */
+    @SuppressWarnings("unchecked")
+    public <C extends Command> AbstractCommandHandler(String channel, Optional<String> resource,
+            Class<C> commandClass,
+            Function<CommandHandlerArgs<C>, RESULT> handler,
+            String commandType) {
         this.channel = channel;
         this.resource = resource;
         this.commandClass = commandClass;
+        this.commandType = commandType;
         this.handler = (CommandHandlerArgs<Command> args) -> handler.apply((CommandHandlerArgs<C>) args);
     }
 
@@ -80,7 +99,7 @@ public class AbstractCommandHandler<RESULT> {
      * @return コマンドタイプが一致する場合はtrue、そうでない場合はfalse
      */
     private boolean commandTypeMatches(Message message) {
-        return commandClass.getName().equals(
+        return commandType.equals(
                 message.getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE));
     }
 
@@ -104,6 +123,15 @@ public class AbstractCommandHandler<RESULT> {
      */
     public Class<? extends Command> getCommandClass() {
         return commandClass;
+    }
+
+    /**
+     * コマンドのタイプを取得します。
+     *
+     * @return コマンドのタイプ
+     */
+    public String getCommandType() {
+        return commandType;
     }
 
     /**

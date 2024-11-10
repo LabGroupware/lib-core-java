@@ -13,6 +13,7 @@ public class CommandEndpoint<C extends Command> {
 
     private final String commandChannel;
     private final Class<C> commandClass;
+    private String commandType;
     private final Set<Class<?>> replyClasses;
 
     /**
@@ -26,6 +27,21 @@ public class CommandEndpoint<C extends Command> {
         this.commandChannel = commandChannel;
         this.commandClass = commandClass;
         this.replyClasses = replyClasses;
+    }
+
+    /**
+     * コンストラクタ。
+     *
+     * @param commandChannel コマンドを送信するチャンネル名
+     * @param commandClass コマンドのクラス
+     * @param replyClasses 受信する返信クラスのセット
+     * @param commandType コマンドタイプ
+     */
+    public CommandEndpoint(String commandChannel, Class<C> commandClass, String commandType, Set<Class<?>> replyClasses) {
+        this.commandChannel = commandChannel;
+        this.commandClass = commandClass;
+        this.replyClasses = replyClasses;
+        this.commandType = commandType;
     }
 
     /**
@@ -44,6 +60,15 @@ public class CommandEndpoint<C extends Command> {
      */
     public Class<C> getCommandClass() {
         return commandClass;
+    }
+
+    /**
+     * コマンドタイプを取得します。
+     *
+     * @return コマンドタイプ
+     */
+    public String getCommandType() {
+        return commandType;
     }
 
     /**

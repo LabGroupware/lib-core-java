@@ -18,10 +18,11 @@ public class CommandWithDestinationAndType {
      * @param channel 送信先チャンネル
      * @param resource 送信リソース
      * @param command 送信するコマンド
+     * @param commandType コマンドのタイプ
      * @return コマンドとして送信されるインスタンス
      */
-    public static CommandWithDestinationAndType command(String channel, String resource, Command command) {
-        return command(new CommandWithDestination(channel, resource, command));
+    public static CommandWithDestinationAndType command(String channel, String resource, Command command, String commandType) {
+        return command(new CommandWithDestination(channel, resource, command, commandType));
     }
 
     /**

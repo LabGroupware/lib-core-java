@@ -33,7 +33,7 @@ public class SagaReplyMessageBuilder extends MessageBuilder {
      * @param id ロック対象のID
      * @return 新しいSagaReplyMessageBuilderインスタンス
      */
-    public static SagaReplyMessageBuilder withLock(Class<?> type, Object id) {
+    public static SagaReplyMessageBuilder withLock(String type, String id) {
         return new SagaReplyMessageBuilder(new LockTarget(type, id));
     }
 
@@ -46,9 +46,22 @@ public class SagaReplyMessageBuilder extends MessageBuilder {
      * @return 構築されたメッセージ
      */
     private <T> Message with(T reply, CommandReplyOutcome outcome) {
+        return with(reply, reply.getClass().getName(), outcome);
+    }
+
+    /**
+     * 指定された応答オブジェクト、応答タイプ、結果を使用してメッセージを構築します。
+     *
+     * @param reply 応答オブジェクト
+     * @param replyType 応答タイプ
+     * @param outcome コマンド応答の結果
+     * @return 構築されたメッセージ
+     * @param <T> 応答オブジェクトの型
+     */
+    private <T> Message with(T reply, String replyType, CommandReplyOutcome outcome) {
         this.body = JSonMapper.toJson(reply);
         withHeader(ReplyMessageHeaders.REPLY_OUTCOME, outcome.name());
-        withHeader(ReplyMessageHeaders.REPLY_TYPE, reply.getClass().getName());
+        withHeader(ReplyMessageHeaders.REPLY_TYPE, replyType);
         return new SagaReplyMessage(body, headers, lockTarget);
     }
 
@@ -59,7 +72,12 @@ public class SagaReplyMessageBuilder extends MessageBuilder {
      * @return 成功応答メッセージ
      */
     public Message withSuccess(Object reply) {
+
         return with(reply, CommandReplyOutcome.SUCCESS);
+    }
+
+    public Message withSuccess(Object reply, String replyType) {
+        return with(reply, replyType, CommandReplyOutcome.SUCCESS);
     }
 
     /**
@@ -68,7 +86,7 @@ public class SagaReplyMessageBuilder extends MessageBuilder {
      * @return デフォルトの成功応答メッセージ
      */
     public Message withSuccess() {
-        return withSuccess(new Success());
+        return withSuccess(new Success(), Success.TYPE);
     }
 
 }

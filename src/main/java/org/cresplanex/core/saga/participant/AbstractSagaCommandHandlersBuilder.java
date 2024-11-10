@@ -20,41 +20,44 @@ public interface AbstractSagaCommandHandlersBuilder {
      *
      * @param <C> 処理対象のコマンドの型
      * @param commandClass コマンドのクラス型
+     * @param commandType コマンドのタイプ
      * @param handler コマンドメッセージを受け取り、複数のメッセージを返すハンドラ関数
      * @return SagaCommandHandlerBuilder コマンドハンドラーを構築するビルダー
      */
     <C extends Command> SagaCommandHandlerBuilder<C> onMessageReturningMessages(Class<C> commandClass,
-            Function<CommandMessage<C>, List<Message>> handler);
+            String commandType, Function<CommandMessage<C>, List<Message>> handler);
 
     /**
      * Optional<Message>を返すコマンドメッセージハンドラーを登録します。
      *
      * @param <C> 処理対象のコマンドの型
      * @param commandClass コマンドのクラス型
+     * @param commandType コマンドのタイプ
      * @param handler コマンドメッセージを受け取り、Optional<Message>を返すハンドラ関数
      * @return SagaCommandHandlerBuilder コマンドハンドラーを構築するビルダー
      */
     <C extends Command> SagaCommandHandlerBuilder<C> onMessageReturningOptionalMessage(Class<C> commandClass,
-            Function<CommandMessage<C>, Optional<Message>> handler);
+            String commandType, Function<CommandMessage<C>, Optional<Message>> handler);
 
     /**
      * 単一のメッセージを返すコマンドメッセージハンドラーを登録します。
      *
      * @param <C> 処理対象のコマンドの型
      * @param commandClass コマンドのクラス型
+     * @param commandType コマンドのタイプ
      * @param handler コマンドメッセージを受け取り、単一のメッセージを返すハンドラ関数
      * @return SagaCommandHandlerBuilder コマンドハンドラーを構築するビルダー
      */
-    <C extends Command> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass,
-            Function<CommandMessage<C>, Message> handler);
+    <C extends Command> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, String commandType, Function<CommandMessage<C>, Message> handler);
 
     /**
      * 戻り値のないコマンドメッセージハンドラーを登録します。
      *
      * @param <C> 処理対象のコマンドの型
      * @param commandClass コマンドのクラス型
+     * @param commandType コマンドのタイプ
      * @param handler コマンドメッセージを受け取り、処理を行うだけで戻り値を持たないハンドラ関数
      * @return SagaCommandHandlerBuilder コマンドハンドラーを構築するビルダー
      */
-    <C extends Command> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, Consumer<CommandMessage<C>> handler);
+    <C extends Command> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, String commandType, Consumer<CommandMessage<C>> handler);
 }

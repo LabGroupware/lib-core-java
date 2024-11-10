@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -21,8 +22,8 @@ public class InvokeParticipantStepBuilder<Data> implements WithCompensationBuild
     private final SimpleSagaDefinitionBuilder<Data> parent;
     private Optional<ParticipantInvocation<Data>> action = Optional.empty();
     private Optional<ParticipantInvocation<Data>> compensation = Optional.empty();
-    private final Map<String, BiConsumer<Data, Object>> actionReplyHandlers = new HashMap<>();
-    private final Map<String, BiConsumer<Data, Object>> compensationReplyHandlers = new HashMap<>();
+    private final Map<String, SagaStep.HandlerAndClass<Data>> actionReplyHandlers = new HashMap<>();
+    private final Map<String, SagaStep.HandlerAndClass<Data>> compensationReplyHandlers = new HashMap<>();
 
     /**
      * コンストラクタ。
@@ -122,15 +123,18 @@ public class InvokeParticipantStepBuilder<Data> implements WithCompensationBuild
      * 返信ハンドラを追加します。
      *
      * @param replyClass 返信のクラス
+     * @param replyType 返信のタイプ
      * @param replyHandler 返信を処理するハンドラ
      * @param <T> 返信の型
      * @return このビルダー
      */
-    public <T> InvokeParticipantStepBuilder<Data> onReply(Class<T> replyClass, BiConsumer<Data, T> replyHandler) {
+    public <T> InvokeParticipantStepBuilder<Data> onReply(Class<T> replyClass, String replyType, BiConsumer<Data, T> replyHandler) {
         if (compensation.isPresent()) {
-            compensationReplyHandlers.put(replyClass.getName(), (data, rawReply) -> replyHandler.accept(data, replyClass.cast(rawReply)));
+            BiConsumer<Data, Object> handler = (data, rawReply) -> replyHandler.accept(data, replyClass.cast(rawReply));
+            compensationReplyHandlers.put(replyType, new SagaStep.HandlerAndClass<>(handler, replyClass));
         } else {
-            actionReplyHandlers.put(replyClass.getName(), (data, rawReply) -> replyHandler.accept(data, replyClass.cast(rawReply)));
+            BiConsumer<Data, Object> handler = (data, rawReply) -> replyHandler.accept(data, replyClass.cast(rawReply));
+            actionReplyHandlers.put(replyType, new SagaStep.HandlerAndClass<>(handler, replyClass));
         }
         return this;
     }

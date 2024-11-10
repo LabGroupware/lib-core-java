@@ -76,7 +76,7 @@ public class CommandDispatcher {
 
         // 適切なコマンドハンドラを検索
         Optional<CommandHandler> possibleMethod = commandHandlers.findTargetMethod(message);
-        if (!possibleMethod.isPresent()) {
+        if (possibleMethod.isEmpty()) {
             throw new RuntimeException("No method for " + message);
         }
 

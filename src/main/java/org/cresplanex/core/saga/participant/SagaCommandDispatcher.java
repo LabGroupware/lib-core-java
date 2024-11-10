@@ -151,6 +151,7 @@ public class SagaCommandDispatcher extends CommandDispatcher {
             return addLockedHeader(messages, lockedTarget.get());
         } else { // ロック対象がない場合
             // メッセージからロック対象を取得
+            // withLockにより, Messageをビルドした時など
             Optional<LockTarget> lt = getLock(messages);
             if (lt.isPresent()) { // ロック対象がある場合
                 Message message = cm.getMessage();
@@ -200,6 +201,6 @@ public class SagaCommandDispatcher extends CommandDispatcher {
      * @return アンロックメッセージの場合はtrue, それ以外はfalse
      */
     private boolean isUnlockMessage(Message message) {
-        return message.getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE).equals(SagaUnlockCommand.class.getName());
+        return message.getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE).equals(SagaUnlockCommand.TYPE);
     }
 }

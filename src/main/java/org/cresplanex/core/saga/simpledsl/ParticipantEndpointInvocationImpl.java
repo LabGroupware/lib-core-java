@@ -53,6 +53,6 @@ public class ParticipantEndpointInvocationImpl<Data, C extends Command> extends 
      */
     @Override
     public CommandWithDestinationAndType makeCommandToSend(Data data) {
-        return CommandWithDestinationAndType.command(commandEndpoint.getCommandChannel(), null, commandProvider.apply(data));
+        return CommandWithDestinationAndType.command(commandEndpoint.getCommandChannel(), null, commandProvider.apply(data), commandEndpoint.getCommandType());
     }
 }

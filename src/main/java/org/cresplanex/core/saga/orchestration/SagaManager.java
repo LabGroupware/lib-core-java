@@ -37,9 +37,9 @@ public interface SagaManager<Data> {
      * ターゲットクラスとIDを使用して新しいSagaインスタンスを作成します。
      *
      * @param data 初期化するSagaデータ
-     * @param targetClass ロックターゲットのクラス
+     * @param targetType ロックターゲットのクラス
      * @param targetId ロックターゲットのID
      * @return 新しく作成されたSagaインスタンス
      */
-    SagaInstance create(Data data, Class<?> targetClass, Object targetId);
+    SagaInstance create(Data data, String targetType, String targetId);
 }

@@ -14,6 +14,7 @@ public class CommandEndpointBuilder<C extends Command> {
 
     private String channel;
     private final Class<C> commandClass;
+    private String commandType;
     private final Set<Class<?>> replyClasses = new HashSet<>();
 
     /**
@@ -48,6 +49,17 @@ public class CommandEndpointBuilder<C extends Command> {
     }
 
     /**
+     * コマンドタイプを設定します。
+     *
+     * @param commandType コマンドタイプ
+     * @return 更新されたCommandEndpointBuilderインスタンス
+     */
+    public CommandEndpointBuilder<C> withCommandType(String commandType) {
+        this.commandType = commandType;
+        return this;
+    }
+
+    /**
      * 返信クラスを追加します。
      *
      * @param replyClass 返信クラス
@@ -65,6 +77,6 @@ public class CommandEndpointBuilder<C extends Command> {
      * @return 新規のCommandEndpointインスタンス
      */
     public CommandEndpoint<C> build() {
-        return new CommandEndpoint<>(channel, commandClass, replyClasses);
+        return new CommandEndpoint<>(channel, commandClass, commandType, replyClasses);
     }
 }

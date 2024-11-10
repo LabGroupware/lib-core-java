@@ -14,7 +14,7 @@ public class SagaInstance {
     private String lastRequestId;
     private SerializedSagaData serializedSagaData;
     private String stateName;
-    private Set<DestinationAndResource> destinationsAndResources;
+    private final Set<DestinationAndResource> destinationsAndResources;
     private Boolean endState = false;
     private Boolean compensating = false;
     private Boolean failed = false;

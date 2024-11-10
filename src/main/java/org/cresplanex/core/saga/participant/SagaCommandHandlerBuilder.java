@@ -37,23 +37,23 @@ public class SagaCommandHandlerBuilder<C extends Command> implements AbstractSag
     }
 
     @Override
-    public <T extends Command> SagaCommandHandlerBuilder<T> onMessageReturningMessages(Class<T> commandClass, Function<CommandMessage<T>, List<Message>> handler) {
-        return parent.onMessageReturningMessages(commandClass, handler);
+    public <T extends Command> SagaCommandHandlerBuilder<T> onMessageReturningMessages(Class<T> commandClass, String commandType, Function<CommandMessage<T>, List<Message>> handler) {
+        return parent.onMessageReturningMessages(commandClass, commandType, handler);
     }
 
     @Override
-    public <T extends Command> SagaCommandHandlerBuilder<T> onMessageReturningOptionalMessage(Class<T> commandClass, Function<CommandMessage<T>, Optional<Message>> handler) {
-        return parent.onMessageReturningOptionalMessage(commandClass, handler);
+    public <T extends Command> SagaCommandHandlerBuilder<T> onMessageReturningOptionalMessage(Class<T> commandClass, String commandType, Function<CommandMessage<T>, Optional<Message>> handler) {
+        return parent.onMessageReturningOptionalMessage(commandClass, commandType, handler);
     }
 
     @Override
-    public <T extends Command> SagaCommandHandlerBuilder<T> onMessage(Class<T> commandClass, Function<CommandMessage<T>, Message> handler) {
-        return parent.onMessage(commandClass, handler);
+    public <T extends Command> SagaCommandHandlerBuilder<T> onMessage(Class<T> commandClass, String commandType, Function<CommandMessage<T>, Message> handler) {
+        return parent.onMessage(commandClass, commandType, handler);
     }
 
     @Override
-    public <T extends Command> SagaCommandHandlerBuilder<T> onMessage(Class<T> commandClass, Consumer<CommandMessage<T>> handler) {
-        return parent.onMessage(commandClass, handler);
+    public <T extends Command> SagaCommandHandlerBuilder<T> onMessage(Class<T> commandClass, String commandType, Consumer<CommandMessage<T>> handler) {
+        return parent.onMessage(commandClass, commandType, handler);
     }
 
     /**
@@ -80,7 +80,7 @@ public class SagaCommandHandlerBuilder<C extends Command> implements AbstractSag
      * @return このビルダーインスタンス
      */
     public SagaCommandHandlerBuilder<C> withPostLock(PostLockFunction<C> postLock) {
-        h.setPostLock((raw, pvs, m) -> postLock.apply(raw, pvs, m));
+        h.setPostLock(postLock);
         return this;
     }
 

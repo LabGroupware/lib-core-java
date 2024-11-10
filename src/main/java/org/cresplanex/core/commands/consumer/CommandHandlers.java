@@ -53,7 +53,7 @@ public class CommandHandlers {
      */
     public Optional<CommandExceptionHandler> findExceptionHandler(CommandHandler commandHandler, Throwable cause) {
         throw new UnsupportedOperationException(String.format("A command handler for command of type %s on channel %s threw an exception",
-                commandHandler.getCommandClass().getName(),
+                commandHandler.getCommandType(),
                 commandHandler.getChannel()),
                 cause);
     }

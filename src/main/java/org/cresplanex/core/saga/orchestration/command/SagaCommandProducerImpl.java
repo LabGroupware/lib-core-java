@@ -31,10 +31,19 @@ public class SagaCommandProducerImpl implements SagaCommandProducer {
             Map<String, String> headers = new HashMap<>(command.getExtraHeaders());
             headers.put(SagaCommandHeaders.SAGA_TYPE, sagaType);
             headers.put(SagaCommandHeaders.SAGA_ID, sagaId);
+            String cmdType = command.getCommandType();
             if (cwdt.isNotification()) {
-                messageId = commandProducer.sendNotification(command.getDestinationChannel(), command.getCommand(), headers);
+                if (cmdType == null) {
+                    messageId = commandProducer.sendNotification(command.getDestinationChannel(), command.getCommand(), headers);
+                } else {
+                    messageId = commandProducer.sendNotification(command.getDestinationChannel(), command.getResource(), command.getCommand(), cmdType, sagaReplyChannel, headers);
+                }
             } else {
-                messageId = commandProducer.send(command.getDestinationChannel(), command.getResource(), command.getCommand(), sagaReplyChannel, headers);
+                if (cmdType == null) {
+                    messageId = commandProducer.send(command.getDestinationChannel(), command.getResource(), command.getCommand(), sagaReplyChannel, headers);
+                } else {
+                    messageId = commandProducer.send(command.getDestinationChannel(), command.getResource(), command.getCommand(), cmdType, sagaReplyChannel, headers);
+                }
             }
         }
         return messageId;

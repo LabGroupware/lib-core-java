@@ -19,7 +19,7 @@ public interface SagaStep<Data> extends ISagaStep<Data> {
      * @param compensating 補償実行中かどうか
      * @return 応答ハンドラのオプショナル
      */
-    Optional<BiConsumer<Data, Object>> getReplyHandler(Message message, boolean compensating);
+    Optional<HandlerAndClass<Data>> getReplyHandler(Message message, boolean compensating);
 
     /**
      * ステップの実行結果を生成します。
@@ -30,4 +30,21 @@ public interface SagaStep<Data> extends ISagaStep<Data> {
      */
     StepOutcome makeStepOutcome(Data data, boolean compensating);
 
+    class HandlerAndClass<T> {
+        private final BiConsumer<T, Object> handler;
+        private final Class<?> clazz;
+
+        public HandlerAndClass(BiConsumer<T, Object> handler, Class<?> clazz) {
+            this.handler = handler;
+            this.clazz = clazz;
+        }
+
+        public BiConsumer<T, Object> getHandler() {
+            return handler;
+        }
+
+        public Class<?> getClazz() {
+            return clazz;
+        }
+    }
 }

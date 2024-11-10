@@ -80,7 +80,7 @@ public class LocalStep<Data> implements SagaStep<Data> {
      * @return 空のOptionalを返します
      */
     @Override
-    public Optional<BiConsumer<Data, Object>> getReplyHandler(Message message, boolean compensating) {
+    public Optional<HandlerAndClass<Data>> getReplyHandler(Message message, boolean compensating) {
         return Optional.empty();
     }
 

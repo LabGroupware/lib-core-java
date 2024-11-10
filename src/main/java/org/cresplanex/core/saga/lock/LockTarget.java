@@ -5,7 +5,7 @@ package org.cresplanex.core.saga.lock;
  */
 public class LockTarget {
 
-    private String target;
+    private final String target;
 
     /**
      * 指定されたクラスとIDを用いて{@code LockTarget}のインスタンスを作成します。
@@ -20,11 +20,11 @@ public class LockTarget {
     /**
      * 指定されたクラス名とID文字列を用いて{@code LockTarget}のインスタンスを作成します。
      *
-     * @param targetClass ロック対象のクラス名
+     * @param targetType ロック対象のタイプ
      * @param targetId ロック対象のID文字列
      */
-    public LockTarget(String targetClass, String targetId) {
-        this(targetClass + "/" + targetId);
+    public LockTarget(String targetType, String targetId) {
+        this(targetType + "/" + targetId);
     }
 
     /**

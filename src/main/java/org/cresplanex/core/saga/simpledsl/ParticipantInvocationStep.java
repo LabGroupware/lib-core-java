@@ -1,6 +1,7 @@
 package org.cresplanex.core.saga.simpledsl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -15,8 +16,8 @@ import org.cresplanex.core.messaging.common.Message;
  */
 public class ParticipantInvocationStep<Data> implements SagaStep<Data> {
 
-    private final Map<String, BiConsumer<Data, Object>> actionReplyHandlers;
-    private final Map<String, BiConsumer<Data, Object>> compensationReplyHandlers;
+    private final Map<String, HandlerAndClass<Data>> actionReplyHandlers;
+    private final Map<String, HandlerAndClass<Data>> compensationReplyHandlers;
     private final Optional<ParticipantInvocation<Data>> participantInvocation;
     private final Optional<ParticipantInvocation<Data>> compensation;
 
@@ -28,10 +29,12 @@ public class ParticipantInvocationStep<Data> implements SagaStep<Data> {
      * @param actionReplyHandlers アクションの返信ハンドラー
      * @param compensationReplyHandlers 補償処理の返信ハンドラー
      */
-    public ParticipantInvocationStep(Optional<ParticipantInvocation<Data>> participantInvocation,
+    public ParticipantInvocationStep(
+            Optional<ParticipantInvocation<Data>> participantInvocation,
             Optional<ParticipantInvocation<Data>> compensation,
-            Map<String, BiConsumer<Data, Object>> actionReplyHandlers,
-            Map<String, BiConsumer<Data, Object>> compensationReplyHandlers) {
+            Map<String, HandlerAndClass<Data>> actionReplyHandlers,
+            Map<String, HandlerAndClass<Data>> compensationReplyHandlers
+    ) {
         this.actionReplyHandlers = actionReplyHandlers;
         this.compensationReplyHandlers = compensationReplyHandlers;
         this.participantInvocation = participantInvocation;
@@ -53,7 +56,7 @@ public class ParticipantInvocationStep<Data> implements SagaStep<Data> {
     }
 
     @Override
-    public Optional<BiConsumer<Data, Object>> getReplyHandler(Message message, boolean compensating) {
+    public Optional<HandlerAndClass<Data>> getReplyHandler(Message message, boolean compensating) {
         String replyType = message.getRequiredHeader(ReplyMessageHeaders.REPLY_TYPE);
         return Optional.ofNullable((compensating ? compensationReplyHandlers : actionReplyHandlers).get(replyType));
     }
