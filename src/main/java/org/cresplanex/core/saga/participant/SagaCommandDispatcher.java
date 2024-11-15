@@ -140,7 +140,8 @@ public class SagaCommandDispatcher extends CommandDispatcher {
                     lockedTarget = Optional.of(target);
                     // ロックを取得できない場合, スタッシュ例外をスロー
                     if (!sagaLockManager.claimLock(sagaType, sagaId, target)) {
-                        throw new StashMessageRequiredException(target);
+//                        throw new StashMessageRequiredException(target);
+                        throw new RuntimeException("Cannot claim lock"); // ハンドラ呼び出し後のため, 例外をスロー
                     }
                 }
             }
@@ -160,8 +161,8 @@ public class SagaCommandDispatcher extends CommandDispatcher {
 
                 // ロックを取得し, できない場合, 例外をスロー
                 if (!sagaLockManager.claimLock(sagaType, sagaId, lt.get().getTarget())) {
-                    // throw new RuntimeException("Cannot claim lock"); // TODO: なぜランタイムをスローする?
-                    throw new StashMessageRequiredException(lt.get().getTarget());
+                     throw new RuntimeException("Cannot claim lock"); // ハンドラ呼び出し後のため, 例外をスロー
+//                    throw new StashMessageRequiredException(lt.get().getTarget());
                 }
 
                 // ロックヘッダーを追加
