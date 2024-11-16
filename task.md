@@ -9,7 +9,7 @@ docker login
 
 build
 ``` sh
-docker build -t ablankz/postgres:1.0.0 postgres
+docker build -t ablankz/postgres:1.1.0 postgres
 docker build -f debezium/postgres/Dockerfile  -t ablankz/debezium:1.0.0 .
 ```
 
