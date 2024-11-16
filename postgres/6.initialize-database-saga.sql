@@ -7,7 +7,7 @@ CREATE TABLE core.saga_instance_participants (
   saga_type VARCHAR(512) NOT NULL,
   saga_id VARCHAR(100) NOT NULL,
   destination VARCHAR(512) NOT NULL,
-  resource VARCHAR(100) NOT NULL,
+  resource VARCHAR(512) NOT NULL,
   PRIMARY KEY(saga_type, saga_id, destination, resource)
 );
 
