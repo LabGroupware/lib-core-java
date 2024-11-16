@@ -2,6 +2,8 @@ package org.cresplanex.core.messaging.consumer.decorator;
 
 import org.cresplanex.core.messaging.common.SubscriberIdAndMessage;
 import org.cresplanex.core.messaging.consumer.duplicate.DuplicateMessageDetector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 重複メッセージを検出して処理するデコレータクラス。
@@ -10,6 +12,7 @@ import org.cresplanex.core.messaging.consumer.duplicate.DuplicateMessageDetector
  */
 public class DuplicateDetectingMessageHandlerDecorator implements MessageHandlerDecorator {
 
+    private static final Logger log = LoggerFactory.getLogger(DuplicateDetectingMessageHandlerDecorator.class);
     private final DuplicateMessageDetector duplicateMessageDetector;
 
     /**

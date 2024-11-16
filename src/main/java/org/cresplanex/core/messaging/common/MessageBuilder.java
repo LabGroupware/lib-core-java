@@ -1,5 +1,8 @@
 package org.cresplanex.core.messaging.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,8 +13,10 @@ import java.util.Map;
  */
 public class MessageBuilder {
 
+    private static final Logger log = LoggerFactory.getLogger(MessageBuilder.class);
     protected String body; // payload
     protected Map<String, String> headers = new HashMap<>();
+    protected boolean throwException = false;
 
     protected MessageBuilder() {
     }
@@ -34,6 +39,11 @@ public class MessageBuilder {
         return this;
     }
 
+    public MessageBuilder withThrowException(boolean throwException) {
+        this.throwException = throwException;
+        return this;
+    }
+
     /**
      * Adds the headers to the headers.
      *
@@ -52,7 +62,7 @@ public class MessageBuilder {
     }
 
     public Message build() {
-        return new MessageImpl(body, headers);
+        return new MessageImpl(body, headers, throwException);
     }
 
     public static MessageBuilder withMessage(Message message) {

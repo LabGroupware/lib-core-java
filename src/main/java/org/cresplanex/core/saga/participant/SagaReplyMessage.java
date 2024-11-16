@@ -20,8 +20,8 @@ public class SagaReplyMessage extends MessageImpl {
      * @param headers メッセージヘッダー
      * @param lockTarget ロック対象のオプショナル
      */
-    public SagaReplyMessage(String body, Map<String, String> headers, Optional<LockTarget> lockTarget) {
-        super(body, headers);
+    public SagaReplyMessage(String body, Map<String, String> headers, boolean throwException, Optional<LockTarget> lockTarget) {
+        super(body, headers, throwException);
         this.lockTarget = lockTarget;
     }
 

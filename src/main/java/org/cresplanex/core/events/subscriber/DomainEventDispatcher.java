@@ -57,6 +57,7 @@ public class DomainEventDispatcher {
      * @param message 受信したメッセージ
      */
     public void messageHandler(Message message) {
+        logger.info("Handling domain event message: {}", message);
         String aggregateType = message.getRequiredHeader(EventMessageHeaders.AGGREGATE_TYPE);
 
         // イベントのタイプを取得し、ドメインイベントのクラス名に変換

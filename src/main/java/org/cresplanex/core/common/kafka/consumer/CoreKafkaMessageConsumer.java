@@ -21,12 +21,15 @@ import org.cresplanex.core.common.kafka.lower.KafkaConsumerFactory;
 import org.cresplanex.core.common.kafka.multi.CoreKafkaMultiMessage;
 import org.cresplanex.core.common.kafka.multi.CoreKafkaMultiMessageConverter;
 import org.cresplanex.core.common.kafka.property.CoreKafkaConsumerProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Kafkaメッセージを消費し、処理するためのクラスです。このクラスは、複数のKafkaメッセージを管理し、 指定されたハンドラーでメッセージを処理します。
  */
 public class CoreKafkaMessageConsumer {
 
+    private static final Logger log = LoggerFactory.getLogger(CoreKafkaMessageConsumer.class);
     private final String id = UUID.randomUUID().toString();
     private final String bootstrapServers;
     private final List<CoreKafkaConsumer> consumers = new ArrayList<>();
@@ -141,6 +144,7 @@ public class CoreKafkaMessageConsumer {
                     .apply(new KafkaMessage(CoreBinaryMessageEncoding.bytesToString(message.getPayload())))
                     .get();
         } catch (RuntimeException e) {
+            log.info("Error processing message==========================");
             callback.accept(null, e);
             throw e;
         } catch (InterruptedException | ExecutionException e) {

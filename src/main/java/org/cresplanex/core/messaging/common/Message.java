@@ -112,4 +112,13 @@ public interface Message {
      */
 
     void removeHeader(String key);
+
+    /**
+     * Returns whether the message throws an exception.
+     *
+     * メッセージが例外をスローするかどうかを返します.
+     *
+     * @return whether the message throws an exception
+     */
+    boolean isThrowException();
 }

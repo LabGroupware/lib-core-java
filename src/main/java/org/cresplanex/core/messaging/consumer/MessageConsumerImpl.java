@@ -72,7 +72,14 @@ public final class MessageConsumerImpl implements MessageConsumer {
 
         MessageSubscription messageSubscription = target.subscribe(subscriberMapping.toExternal(subscriberId),
                 channels.stream().map(channelMapping::transform).collect(Collectors.toSet()),
-                message -> decoratedHandler.accept(new SubscriberIdAndMessage(subscriberId, message)));
+                message -> {
+            try {
+                decoratedHandler.accept(new SubscriberIdAndMessage(subscriberId, message));
+            } catch (Exception e) {
+                logger.error("Got exception: ", e);
+                throw e;
+            }
+        });
 
         logger.info("Subscribed: subscriberId = {}, channels = {}", subscriberId, channels);
 

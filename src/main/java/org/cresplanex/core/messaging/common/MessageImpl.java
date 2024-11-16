@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A message that can be sent.
@@ -13,15 +15,18 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class MessageImpl implements Message {
 
+    private static final Logger log = LoggerFactory.getLogger(MessageImpl.class);
     private String payload;
     private Map<String, String> headers;
+    private boolean throwException;
 
     public MessageImpl() {
     }
 
-    public MessageImpl(String payload, Map<String, String> headers) {
+    public MessageImpl(String payload, Map<String, String> headers, boolean throwException) {
         this.payload = payload;
         this.headers = headers;
+        this.throwException = throwException;
     }
 
     @Override
@@ -85,5 +90,10 @@ public class MessageImpl implements Message {
     @Override
     public void removeHeader(String key) {
         headers.remove(key);
+    }
+
+    @Override
+    public boolean isThrowException() {
+        return throwException;
     }
 }

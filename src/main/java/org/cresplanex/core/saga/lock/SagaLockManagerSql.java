@@ -11,6 +11,7 @@ public class SagaLockManagerSql {
     private final String insertIntoSagaStashTableSql;
     private final String selectFromSagaLockTableSql;
     private final String selectFromSagaStashTableSql;
+    private final String findFromSagaLockTableSql;
     private final String updateSagaLockTableSql;
     private final String deleteFromSagaLockTableSql;
     private final String deleteFromSagaStashTableSql;
@@ -31,6 +32,8 @@ public class SagaLockManagerSql {
         insertIntoSagaStashTableSql = String.format("INSERT INTO %s(message_id, target, saga_type, saga_id, message_headers, message_payload) VALUES(?, ?, ?, ?, ?, ?)", sagaStashTable);
         // Lock Tableからtargetを基にsaga_idを取得するSQL, ただし行レベルでロックを取得するためにFOR UPDATEを付与
         selectFromSagaLockTableSql = String.format("SELECT saga_id FROM %s WHERE target = ? FOR UPDATE", sagaLockTable);
+        // Lock Tableからtargetを基にsaga_idを取得するSQL
+        findFromSagaLockTableSql = String.format("SELECT saga_id FROM %s WHERE target = ?", sagaLockTable);
         // Stash Tableからtargetを基に最も古いメッセージを取得するSQL
         selectFromSagaStashTableSql = String.format("SELECT message_id, target, saga_type, saga_id, message_headers, message_payload FROM %s WHERE target = ? ORDER BY message_id LIMIT 1", sagaStashTable);
         // Lock Tableのtargetを基にsaga_typeとsaga_idを更新するSQL
@@ -75,6 +78,15 @@ public class SagaLockManagerSql {
      */
     public String getSelectFromSagaStashTableSql() {
         return selectFromSagaStashTableSql;
+    }
+
+    /**
+     * saga_lock_table からデータを取得する SQL を取得します。
+     *
+     * @return データ取得用の SQL クエリ
+     */
+    public String getFindFromSagaLockTableSql() {
+        return findFromSagaLockTableSql;
     }
 
     /**

@@ -10,20 +10,21 @@ import org.cresplanex.core.messaging.common.MessageBuilder;
 
 public class CommandHandlerReplyBuilder {
 
-    private static <T> Message with(T reply, String replyType, CommandReplyOutcome outcome) {
+    private static <T> Message with(T reply, String replyType, CommandReplyOutcome outcome, boolean isException) {
         MessageBuilder messageBuilder = MessageBuilder
                 .withPayload(JSonMapper.toJson(reply))
                 .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, outcome.name())
-                .withHeader(ReplyMessageHeaders.REPLY_TYPE, replyType);
+                .withHeader(ReplyMessageHeaders.REPLY_TYPE, replyType)
+                .withThrowException(isException);
         return messageBuilder.build();
     }
 
     private static <T> Message with(T reply, CommandReplyOutcome outcome) {
-        return with(reply, reply.getClass().getName(), outcome);
+        return with(reply, reply.getClass().getName(), outcome, false);
     }
 
     public static Message withSuccess(Object reply, String replyType) {
-        return with(reply, replyType, CommandReplyOutcome.SUCCESS);
+        return with(reply, replyType, CommandReplyOutcome.SUCCESS, false);
     }
 
     public static Message withSuccess(Object reply) {
@@ -35,7 +36,7 @@ public class CommandHandlerReplyBuilder {
     }
 
     public static Message withFailure(Object reply, String replyType) {
-        return with(reply, replyType, CommandReplyOutcome.FAILURE);
+        return with(reply, replyType, CommandReplyOutcome.FAILURE, false);
     }
 
     public static Message withFailure() {
@@ -46,4 +47,15 @@ public class CommandHandlerReplyBuilder {
         return with(reply, CommandReplyOutcome.FAILURE);
     }
 
+    public static Message withException(Object reply, String replyType) {
+        return with(reply, replyType, CommandReplyOutcome.FAILURE, true);
+    }
+
+    public static Message withException() {
+        return withException(new Failure(), Failure.TYPE);
+    }
+
+    public static Message withException(Object reply) {
+        return with(reply, reply.getClass().getName(), CommandReplyOutcome.FAILURE, true);
+    }
 }

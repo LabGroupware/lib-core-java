@@ -23,6 +23,8 @@ import org.cresplanex.core.commands.consumer.PathVariables;
 import org.cresplanex.core.messaging.common.Message;
 import org.cresplanex.core.messaging.common.MessageBuilder;
 import org.cresplanex.core.messaging.consumer.MessageConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * SagaCommandDispatcherは, サガパターンのためのコマンドディスパッチャーです。 メッセージのロックやアンロック,
@@ -30,6 +32,7 @@ import org.cresplanex.core.messaging.consumer.MessageConsumer;
  */
 public class SagaCommandDispatcher extends CommandDispatcher {
 
+    private static final Logger log = LoggerFactory.getLogger(SagaCommandDispatcher.class);
     private final SagaLockManager sagaLockManager;
 
     /**
@@ -119,6 +122,7 @@ public class SagaCommandDispatcher extends CommandDispatcher {
                 String sagaId = getSagaId(message);
                 String target = lockTarget.getTarget();
                 lockedTarget = Optional.of(target);
+                log.info("Claiming lock for {} : {}", sagaId, target);
                 // ロックを取得できない場合, スタッシュ例外をスロー
                 if (!sagaLockManager.claimLock(sagaType, sagaId, target)) {
                     throw new StashMessageRequiredException(target);
@@ -138,6 +142,7 @@ public class SagaCommandDispatcher extends CommandDispatcher {
                     String sagaId = getSagaId(message);
                     String target = lockTarget.getTarget();
                     lockedTarget = Optional.of(target);
+                    log.info("Claiming lock for {} : {}", sagaId, target);
                     // ロックを取得できない場合, スタッシュ例外をスロー
                     if (!sagaLockManager.claimLock(sagaType, sagaId, target)) {
 //                        throw new StashMessageRequiredException(target);
@@ -159,6 +164,7 @@ public class SagaCommandDispatcher extends CommandDispatcher {
                 String sagaType = getSagaType(message);
                 String sagaId = getSagaId(message);
 
+                log.info("Claiming lock for {} : {}", sagaId, lt.get().getTarget());
                 // ロックを取得し, できない場合, 例外をスロー
                 if (!sagaLockManager.claimLock(sagaType, sagaId, lt.get().getTarget())) {
                      throw new RuntimeException("Cannot claim lock"); // ハンドラ呼び出し後のため, 例外をスロー

@@ -68,7 +68,6 @@ public class CommandDispatcher {
      * @param message 受信したメッセージ
      */
     public void messageHandler(Message message) {
-        logger.trace("Received message {} {}", commandDispatcherId, message);
 
         // メッセージのコマンドタイプを内部用に設定
         message.setHeader(CommandMessageHeaders.COMMAND_TYPE,
@@ -99,6 +98,12 @@ public class CommandDispatcher {
             logger.error("Generated error", e);
             handleException(m, e, commandReplyToken);
             return;
+        }
+
+        boolean anyHasThrowException = replies.stream().anyMatch(Message::isThrowException);
+
+        if (anyHasThrowException) {
+            throw new ReplyException(commandReplyToken, replies);
         }
 
         commandReplyProducer.sendReplies(commandReplyToken, replies);

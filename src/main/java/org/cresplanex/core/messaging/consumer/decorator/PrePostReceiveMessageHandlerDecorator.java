@@ -5,6 +5,8 @@ import java.util.Arrays;
 import org.cresplanex.core.messaging.common.Message;
 import org.cresplanex.core.messaging.common.MessageInterceptor;
 import org.cresplanex.core.messaging.common.SubscriberIdAndMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * メッセージの受信前後に特定の処理を行うデコレータクラス。
@@ -13,6 +15,7 @@ import org.cresplanex.core.messaging.common.SubscriberIdAndMessage;
  */
 public class PrePostReceiveMessageHandlerDecorator implements MessageHandlerDecorator {
 
+    private static final Logger log = LoggerFactory.getLogger(PrePostReceiveMessageHandlerDecorator.class);
     // private final Logger logger = LoggerFactory.getLogger(getClass());
     private final MessageInterceptor[] messageInterceptors;
 
@@ -37,6 +40,9 @@ public class PrePostReceiveMessageHandlerDecorator implements MessageHandlerDeco
         preReceive(message);
         try {
             messageHandlerDecoratorChain.invokeNext(subscriberIdAndMessage);
+        } catch (Throwable t) {
+            log.error("Failed to handle message: subscriberId = {}, message = {}", subscriberIdAndMessage.getSubscriberId(), subscriberIdAndMessage.getMessage(), t);
+            throw t;
         } finally {
             postReceive(message);
         }

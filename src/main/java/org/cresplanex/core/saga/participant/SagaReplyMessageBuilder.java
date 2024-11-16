@@ -62,7 +62,7 @@ public class SagaReplyMessageBuilder extends MessageBuilder {
         this.body = JSonMapper.toJson(reply);
         withHeader(ReplyMessageHeaders.REPLY_OUTCOME, outcome.name());
         withHeader(ReplyMessageHeaders.REPLY_TYPE, replyType);
-        return new SagaReplyMessage(body, headers, lockTarget);
+        return new SagaReplyMessage(body, headers, throwException, lockTarget);
     }
 
     /**

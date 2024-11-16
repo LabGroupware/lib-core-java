@@ -137,8 +137,8 @@ public class SagaManagerImpl<Data>
                 throw new TargetConflictOnSagaStartException("Failed to claim lock for resource: " + r);
             }
             // 最後に解放を行うため
-            sagaInstance.addDestinationsAndResources(singleton(
-                    new DestinationAndResource(getSagaCommandSelfChannel(), r)));
+//            sagaInstance.addDestinationsAndResources(singleton(
+//                    new DestinationAndResource(getSagaCommandSelfChannel(), r)));
         });
 
         // サーガの開始アクションを取得
@@ -220,7 +220,7 @@ public class SagaManagerImpl<Data>
      * @param message 処理するメッセージ
      */
     public void handleMessage(Message message) {
-        logger.debug("handle message invoked {}", message);
+        logger.info("handle message invoked {}", message);
         if (message.hasHeader(SagaReplyHeaders.REPLY_SAGA_ID)) {
             handleReply(message);
         } else {
@@ -300,6 +300,8 @@ public class SagaManagerImpl<Data>
                 if (actions.isEndState()) {
                     performEndStateActions(sagaId, sagaInstance, actions.isCompensating(), actions.isFailed(), sagaData);
                 }
+
+                logger.info("Updating saga instance: {}", sagaInstance);
 
                 // サーガインスタンス情報を更新
                 sagaInstanceRepository.update(sagaInstance);

@@ -1,10 +1,13 @@
 package org.cresplanex.core.messaging.consumer.decorator;
 
 import org.cresplanex.core.messaging.common.SubscriberIdAndMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -15,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class OptimisticLockingDecorator implements MessageHandlerDecorator, Ordered {
+
+    private static final Logger log = LoggerFactory.getLogger(OptimisticLockingDecorator.class);
 
     /**
      * `OptimisticLockingFailureException`が発生した際にリトライを実施しながら、

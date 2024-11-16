@@ -2,6 +2,7 @@ package org.cresplanex.core.messaging.consumer.decorator;
 
 import java.util.Arrays;
 
+import org.cresplanex.core.commands.consumer.ReplyException;
 import org.cresplanex.core.messaging.common.Message;
 import org.cresplanex.core.messaging.common.MessageInterceptor;
 import org.cresplanex.core.messaging.common.SubscriberIdAndMessage;
@@ -41,8 +42,11 @@ public class PrePostHandlerMessageHandlerDecorator implements MessageHandlerDeco
         try {
             messageHandlerDecoratorChain.invokeNext(subscriberIdAndMessage);
             postHandle(subscriberId, message, null);
+        } catch (ReplyException e) {
+            postHandle(subscriberId, message, e);
+            throw e;
         } catch (Throwable t) {
-            logger.error("デコレータの実行に失敗しました", t);
+            logger.error("Failed to handle message: subscriberId = {}, message = {}", subscriberId, message, t);
             postHandle(subscriberId, message, t);
             throw t;
         }

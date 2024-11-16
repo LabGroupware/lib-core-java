@@ -35,18 +35,34 @@ public class EnlistedAggregatesDao {
      */
     public void save(String sagaId, Set<EnlistedAggregate> enlistedAggregates) {
         for (EnlistedAggregate ela : enlistedAggregates) {
-            try {
+           boolean exists = !coreJdbcStatementExecutor.query("Select saga_id from saga_enlisted_aggregates where saga_id = ? AND aggregate_type = ? AND aggregate_id = ?",
+                    (rs, rowNum) -> rs.getString("saga_id"),
+                    sagaId,
+                    ela.getAggregateClass().getName(),
+                    ela.getAggregateId()).isEmpty();
+            if (!exists) {
                 coreJdbcStatementExecutor.update("INSERT INTO saga_enlisted_aggregates(saga_id, aggregate_type, aggregate_id) values(?,?,?)",
                         sagaId,
-                        ela.getAggregateClass(),
+                        ela.getAggregateClass().getName(),
                         ela.getAggregateId());
-            } catch (CoreDuplicateKeyException e) {
-                logger.info("Cannot save aggregate, key duplicate: sagaId = {}, aggregateClass = {}, aggregateId = {}",
-                        sagaId, ela.getAggregateClass(), ela.getAggregateId());
-                // 重複エラーを無視
             }
         }
     }
+
+//    public void save(String sagaId, Set<EnlistedAggregate> enlistedAggregates) {
+//        for (EnlistedAggregate ela : enlistedAggregates) {
+//            try {
+//                coreJdbcStatementExecutor.update("INSERT INTO saga_enlisted_aggregates(saga_id, aggregate_type, aggregate_id) values(?,?,?)",
+//                        sagaId,
+//                        ela.getAggregateClass(),
+//                        ela.getAggregateId());
+//            } catch (CoreDuplicateKeyException e) {
+//                logger.info("Cannot save aggregate, key duplicate: sagaId = {}, aggregateClass = {}, aggregateId = {}",
+//                        sagaId, ela.getAggregateClass(), ela.getAggregateId());
+//                // 重複エラーを無視
+//            }
+//        }
+//    }
 
     /**
      * 指定されたサガIDに関連するエンリストされた集約のセットを検索します。

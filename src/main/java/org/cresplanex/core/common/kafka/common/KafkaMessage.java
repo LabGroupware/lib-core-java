@@ -72,7 +72,7 @@ public class KafkaMessage {
 
             Map<String, String> headers = mapper.readValue(headersStr, mapType);
 
-            return  new MessageImpl(payloadStr, headers);
+            return new MessageImpl(payloadStr, headers, false);
         } catch (Exception e) {
             return null;
         }

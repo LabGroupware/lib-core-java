@@ -1,5 +1,6 @@
 package org.cresplanex.core.messaging.consumer.decorator;
 
+import org.cresplanex.core.commands.consumer.ReplyException;
 import org.cresplanex.core.messaging.common.Message;
 import org.cresplanex.core.messaging.common.SubscriberIdAndMessage;
 import org.cresplanex.core.messaging.consumer.MessageHandler;
@@ -54,6 +55,9 @@ public class DecoratedMessageHandlerFactory {
                 logger.trace("Invoking handler {} {}", subscriberId, message.getId());
                 mh.accept(smh.getMessage());
                 logger.trace("handled message {} {}", subscriberId, message.getId());
+            } catch (ReplyException e) {
+                logger.trace("Reply exception {} {}", subscriberId, message.getId());
+                throw e;
             } catch (Exception e) {
                 logger.error("Got exception {} {}", subscriberId, message.getId());
                 logger.error("Got exception ", e);

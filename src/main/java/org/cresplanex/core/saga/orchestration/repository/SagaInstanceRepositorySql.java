@@ -15,6 +15,7 @@ public class SagaInstanceRepositorySql {
     private final String insertIntoSagaInstanceParticipantsSql;
     private final String selectFromSagaInstanceSql;
     private final String selectFromSagaInstanceParticipantsSql;
+    private final String findSagaInstanceParticipantsSql;
     private final String updateSagaInstanceSql;
 
     /**
@@ -35,6 +36,8 @@ public class SagaInstanceRepositorySql {
         selectFromSagaInstanceSql = String.format("SELECT * FROM %s WHERE saga_type = ? AND saga_id = ?", sagaInstanceTable);
         // saga instance participantsテーブルからsaga_typeとsaga_idをもとにDESTINATIONとRESOURCEを取得するためのSQL文
         selectFromSagaInstanceParticipantsSql = String.format("SELECT destination, resource FROM %s WHERE saga_type = ? AND saga_id = ?", sagaInstanceParticipantsTable);
+        // saga instance participantsテーブルから指定のsaga_typeとsaga_id, DESTINATION, RESOURCEを持つレコードの数を取得するためのSQL文
+        findSagaInstanceParticipantsSql = String.format("SELECT destination, resource FROM %s WHERE saga_type = ? AND saga_id = ? AND destination = ? AND resource = ?", sagaInstanceParticipantsTable);
 
         // saga instanceテーブルのレコードをsaga_typeとsaga_idをもとに更新するためのSQL文
         updateSagaInstanceSql = String.format("UPDATE %s SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ?, end_state = ?, compensating = ?, failed = ? where saga_type = ? AND saga_id = ?", sagaInstanceTable);
@@ -74,6 +77,15 @@ public class SagaInstanceRepositorySql {
      */
     public String getSelectFromSagaInstanceParticipantsSql() {
         return selectFromSagaInstanceParticipantsSql;
+    }
+
+    /**
+     * サーガインスタンス参加者の検索SQL文を取得します。
+     *
+     * @return サーガインスタンス参加者検索用SQL文
+     */
+    public String getFindSagaInstanceParticipantsSql() {
+        return findSagaInstanceParticipantsSql;
     }
 
     /**

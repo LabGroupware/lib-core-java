@@ -29,21 +29,42 @@ public class SqlTableBasedDuplicateMessageDetector implements DuplicateMessageDe
 
     @Override
     public boolean isDuplicate(String consumerId, String messageId) {
-        try {
-            String table = coreSchema.qualifyTable("received_messages");
+        String table = coreSchema.qualifyTable("received_messages");
 
+        boolean exists = !coreJdbcStatementExecutor.query(String.format("select consumer_id from %s where consumer_id = ? and message_id = ?", table),
+                (rs, rowNum) -> rs.getString("consumer_id"),
+                consumerId,
+                messageId).isEmpty();
+        if (!exists) {
             coreJdbcStatementExecutor.update(String.format("insert into %s(consumer_id, message_id, creation_time) values(?, ?, %s)",
-                    table,
-                    currentTimeInMillisecondsSql),
+                            table,
+                            currentTimeInMillisecondsSql),
                     consumerId,
                     messageId);
-
             return false;
-        } catch (CoreDuplicateKeyException e) {
+        } else {
             logger.info("Message duplicate: consumerId = {}, messageId = {}", consumerId, messageId);
             return true;
         }
     }
+
+//    @Override
+//    public boolean isDuplicate(String consumerId, String messageId) {
+//        try {
+//            String table = coreSchema.qualifyTable("received_messages");
+//
+//            coreJdbcStatementExecutor.update(String.format("insert into %s(consumer_id, message_id, creation_time) values(?, ?, %s)",
+//                            table,
+//                            currentTimeInMillisecondsSql),
+//                    consumerId,
+//                    messageId);
+//
+//            return false;
+//        } catch (CoreDuplicateKeyException e) {
+//            logger.info("Message duplicate: consumerId = {}, messageId = {}", consumerId, messageId);
+//            return true;
+//        }
+//    }
 
     @Override
     public void doWithMessage(SubscriberIdAndMessage subscriberIdAndMessage, Runnable callback) {

@@ -45,30 +45,49 @@ public class SagaLockManagerJdbc implements SagaLockManager {
     @Override
     public boolean claimLock(String sagaType, String sagaId, String target) {
         while (true) {
-            try {
-                // Lock Tableに対してレコードを挿入するSQL(target, saga_type, saga_id)の実行
-                // targetが別スレッド, インスタンスなどでロックされている場合は例外がスローされる
-                // targetがprimary keyなので, 同一targetに対してレコードを挿入することはできない
+            Optional<String> owningSagaId = select(target);
+            if (owningSagaId.isEmpty()){
                 coreJdbcStatementExecutor.update(sagaLockManagerSql.getInsertIntoSagaLockTableSql(), target, sagaType, sagaId);
                 logger.debug("Saga {} {} has locked {}", sagaType, sagaId, target);
-                // 成功すれば, ok
                 return true;
-            } catch (CoreDuplicateKeyException e) {
-                // Lock tableからtargetを基に行レベルのロックを取得して, その行のsaga_idを取得する
-                Optional<String> owningSagaId = selectForUpdate(target);
-                if (owningSagaId.isPresent()) {
-                    if (owningSagaId.get().equals(sagaId)) { // 別スレッド, インスタンスなどでロックされている場合でも, 同じsaga_idであればそのロックを取得してok
-                        return true;
-                    } else {
-                        // targetが別のsagaにロックされている場合
-                        // このときの対処はそれぞれで異なる.
-                        logger.debug("Saga {} {} is blocked by {} which has locked {}", sagaType, sagaId, owningSagaId, target);
-                        return false;
-                    }
-                }
-                logger.debug("{} is repeating attempt to lock {}", sagaId, target);
             }
+            owningSagaId = selectForUpdate(target);
+            if (owningSagaId.isPresent()) {
+                if (owningSagaId.get().equals(sagaId)) {
+                    return true;
+                } else {
+                    logger.debug("Saga {} {} is blocked by {} which has locked {}", sagaType, sagaId, owningSagaId, target);
+                    return false;
+                }
+            }
+            logger.debug("{} is repeating attempt to lock {}", sagaId, target);
         }
+
+//        while (true) {
+//            try {
+//                // Lock Tableに対してレコードを挿入するSQL(target, saga_type, saga_id)の実行
+//                // targetが別スレッド, インスタンスなどでロックされている場合は例外がスローされる
+//                // targetがprimary keyなので, 同一targetに対してレコードを挿入することはできない
+//                coreJdbcStatementExecutor.update(sagaLockManagerSql.getInsertIntoSagaLockTableSql(), target, sagaType, sagaId);
+//                logger.debug("Saga {} {} has locked {}", sagaType, sagaId, target);
+//                // 成功すれば, ok
+//                return true;
+//            } catch (CoreDuplicateKeyException e) {
+//                // Lock tableからtargetを基に行レベルのロックを取得して, その行のsaga_idを取得する
+//                Optional<String> owningSagaId = selectForUpdate(target);
+//                if (owningSagaId.isPresent()) {
+//                    if (owningSagaId.get().equals(sagaId)) { // 別スレッド, インスタンスなどでロックされている場合でも, 同じsaga_idであればそのロックを取得してok
+//                        return true;
+//                    } else {
+//                        // targetが別のsagaにロックされている場合
+//                        // このときの対処はそれぞれで異なる.
+//                        logger.debug("Saga {} {} is blocked by {} which has locked {}", sagaType, sagaId, owningSagaId, target);
+//                        return false;
+//                    }
+//                }
+//                logger.debug("{} is repeating attempt to lock {}", sagaId, target);
+//            }
+//        }
     }
 
     /**
@@ -81,6 +100,10 @@ public class SagaLockManagerJdbc implements SagaLockManager {
         // Lock Tableからtargetを基に行レベルのロックを取得して, その行のsaga_idを取得する
         return coreJdbcStatementExecutor
                 .query(sagaLockManagerSql.getSelectFromSagaLockTableSql(), (rs, rowNum) -> rs.getString("saga_id"), target).stream().findFirst();
+    }
+
+    private Optional<String> select(String target) {
+        return coreJdbcStatementExecutor.query(sagaLockManagerSql.getFindFromSagaLockTableSql(), (rs, rowNum) -> rs.getString("saga_id"), target).stream().findFirst();
     }
 
     /**

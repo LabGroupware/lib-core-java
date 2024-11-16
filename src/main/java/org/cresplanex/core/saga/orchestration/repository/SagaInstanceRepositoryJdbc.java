@@ -63,24 +63,56 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
      */
     private void saveDestinationsAndResources(SagaInstance sagaInstance) {
         for (DestinationAndResource dr : sagaInstance.getDestinationsAndResources()) {
-            try {
-                // saga instanceでの全ての宛先とリソースを保存
-                coreJdbcStatementExecutor.update(sagaInstanceRepositorySql.getInsertIntoSagaInstanceParticipantsSql(),
-                        sagaInstance.getSagaType(),
-                        sagaInstance.getId(),
-                        dr.getDestination(),
-                        dr.getResource()
-                );
-            } catch (CoreDuplicateKeyException e) {
-                // 重複の場合は何もしない
-                logger.info("key duplicate: sagaType = {}, sagaId = {}, destination = {}, resource = {}",
+            boolean exists = !coreJdbcStatementExecutor.query(
+                    sagaInstanceRepositorySql.getFindSagaInstanceParticipantsSql(),
+                    (rs, rownum) -> rs.getString("destination"),
+                    sagaInstance.getSagaType(),
+                    sagaInstance.getId(),
+                    dr.getDestination(),
+                    dr.getResource()
+            ).isEmpty();
+            if (exists) {
+                logger.info("already exists: sagaType = {}, sagaId = {}, destination = {}, resource = {}",
                         sagaInstance.getSagaType(),
                         sagaInstance.getId(),
                         dr.getDestination(),
                         dr.getResource());
+                continue;
             }
+            logger.info("saving: sagaType = {}, sagaId = {}, destination = {}, resource = {}",
+                    sagaInstance.getSagaType(),
+                    sagaInstance.getId(),
+                    dr.getDestination(),
+                    dr.getResource());
+            coreJdbcStatementExecutor.update(sagaInstanceRepositorySql.getInsertIntoSagaInstanceParticipantsSql(),
+                    sagaInstance.getSagaType(),
+                    sagaInstance.getId(),
+                    dr.getDestination(),
+                    dr.getResource()
+            );
         }
     }
+
+//    private void saveDestinationsAndResources(SagaInstance sagaInstance) {
+//        for (DestinationAndResource dr : sagaInstance.getDestinationsAndResources()) {
+//            try {
+//                // saga instanceでの全ての宛先とリソースを保存
+//                coreJdbcStatementExecutor.update(sagaInstanceRepositorySql.getInsertIntoSagaInstanceParticipantsSql(),
+//                        sagaInstance.getSagaType(),
+//                        sagaInstance.getId(),
+//                        dr.getDestination(),
+//                        dr.getResource()
+//                );
+//            } catch (CoreDuplicateKeyException e) {
+//                // 重複の場合は何もしない
+//                logger.info("key duplicate: sagaType = {}, sagaId = {}, destination = {}, resource = {}",
+//                        sagaInstance.getSagaType(),
+//                        sagaInstance.getId(),
+//                        dr.getDestination(),
+//                        dr.getResource());
+//            }
+//        }
+//    }
 
     /**
      * 指定されたサーガタイプとサーガIDに基づいてサーガインスタンスを検索します。
