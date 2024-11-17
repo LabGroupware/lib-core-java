@@ -137,13 +137,15 @@ public class SagaManagerImpl<Data>
                 throw new TargetConflictOnSagaStartException("Failed to claim lock for resource: " + r);
             }
             // 最後に解放を行うため
-//            sagaInstance.addDestinationsAndResources(singleton(
-//                    new DestinationAndResource(getSagaCommandSelfChannel(), r)));
+            sagaInstance.addDestinationsAndResources(singleton(
+                    new DestinationAndResource(getSagaCommandSelfChannel(), r)));
         });
 
         // サーガの開始アクションを取得
         SagaActions<Data> actions = getStateDefinition().start(sagaData);
-        // ローカル例外がある場合は, その例外を投げる
+        // 初めのStepが失敗した場合は, 即時終了
+        // SagaInstanceFactoryのcreateメソッド内で, このメソッドが呼ばれるため,
+        // ここでの例外はSagaInstanceFactoryのcreateメソッドに伝播する
         actions.getLocalException().ifPresent(e -> {
             performEndStateActions(sagaId, sagaInstance, false, true, sagaData);
             throw e;
@@ -278,6 +280,8 @@ public class SagaManagerImpl<Data>
 
                 // ローカル例外がある場合は, 失敗のリプライが送られる代わりにダミーでこのリプライメッセージを登録したアクションを次のアクションとする.
                 // ただし, 失敗メッセージなので、補償トランザクションの開始が行われるようにisSuccessfulReplyなどを実装する必要がある。
+                // 失敗メッセージがきたことを仮定して処理
+                // 投げられた例外が何かは関係ない
                 actions = getStateDefinition().handleReply(sagaType, sagaId, actions.getUpdatedState().get(), actions.getUpdatedSagaData().get(), MessageBuilder
                         .withPayload("{}")
                         .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, CommandReplyOutcome.FAILURE.name())

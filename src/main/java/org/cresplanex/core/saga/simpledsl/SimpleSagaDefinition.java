@@ -38,6 +38,7 @@ public class SimpleSagaDefinition<Data>
         boolean compensating = state.isCompensating();
 
         // 以前のステップのリプライハンドラを呼び出す
+        // Local Stepでは, ハンドラを登録不可
         currentStep.getReplyHandler(message, compensating).ifPresent(handlerAndClass -> invokeReplyHandler(message, sagaData, (d, m) -> {
             handlerAndClass.getHandler().accept(d, m);
             return null;

@@ -101,10 +101,13 @@ public class LocalStep<Data> implements SagaStep<Data> {
             }
             return makeLocalOutcome(Optional.empty());
         } catch (RuntimeException e) {
+            // ローカルハンドラにて登録することでStateとExceptionを用いた処理が可能
             localExceptionSavers.stream()
                     .filter(saver -> saver.shouldSave(e))
                     .findFirst()
                     .ifPresent(saver -> saver.save(data, e));
+
+            // 予期する例外の場合はロールバックを行う
             if (rollbackExceptions.isEmpty() || rollbackExceptions.stream().anyMatch(c -> c.isInstance(e))) {
                 return makeLocalOutcome(Optional.of(e)); 
             }else {

@@ -79,8 +79,10 @@ public abstract class AbstractSimpleSagaDefinition<Data, Step extends ISagaStep<
         if (currentStep.isSuccessfulReply(compensating, message)) {
             return nextStepToExecute(state, sagaData);
         } else if (compensating) {
+            // 補償トランザクションが失敗した場合
             return handleFailedCompensatingTransaction(sagaType, sagaId, state, message);
         } else {
+            // 通常のトランザクションが失敗した場合
             return nextStepToExecute(state.startCompensating(), sagaData);
         }
     }
