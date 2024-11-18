@@ -3,6 +3,7 @@ package org.cresplanex.core.messaging.consumer.decorator;
 import org.cresplanex.core.commands.consumer.CommandReplyProducer;
 import org.cresplanex.core.commands.consumer.ReplyException;
 import org.cresplanex.core.messaging.common.SubscriberIdAndMessage;
+import org.cresplanex.core.messaging.consumer.duplicate.DuplicateMessageDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -14,9 +15,11 @@ public class ReplyExceptionHandleDecorator implements MessageHandlerDecorator, O
 
     private static final Logger log = LoggerFactory.getLogger(ReplyExceptionHandleDecorator.class);
     private final CommandReplyProducer commandReplyProducer;
+    private final DuplicateMessageDetector duplicateMessageDetector;
 
-    public ReplyExceptionHandleDecorator(CommandReplyProducer commandReplyProducer) {
+    public ReplyExceptionHandleDecorator(CommandReplyProducer commandReplyProducer, DuplicateMessageDetector duplicateMessageDetector) {
         this.commandReplyProducer = commandReplyProducer;
+        this.duplicateMessageDetector = duplicateMessageDetector;
     }
 
     /**
@@ -32,6 +35,14 @@ public class ReplyExceptionHandleDecorator implements MessageHandlerDecorator, O
             messageHandlerDecoratorChain.invokeNext(subscriberIdAndMessage);
         } catch (ReplyException e) {
             commandReplyProducer.sendReplies(e.getCommandReplyToken(), e.getReplies());
+            // この例外でもトランザクションがロールバックされていたため,
+            // received_messagesテーブルにはメッセージが挿入されていない
+            // 重複処理の追加を行う.
+            duplicateMessageDetector.doWithMessage(subscriberIdAndMessage, () -> {
+                // 処理前に重複メッセージがなく, その中の処理が失敗してロールバックが行われているため,
+                // 内部トランザクションがReplyExceptionを投げた場合は必ずここが実行される.
+                log.info("Insert received message for Reply Exception");
+            });
         }
     }
 
