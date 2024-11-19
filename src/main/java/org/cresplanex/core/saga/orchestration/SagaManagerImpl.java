@@ -147,7 +147,7 @@ public class SagaManagerImpl<Data>
         // SagaInstanceFactoryのcreateメソッド内で, このメソッドが呼ばれるため,
         // ここでの例外はSagaInstanceFactoryのcreateメソッドに伝播する
         actions.getLocalException().ifPresent(e -> {
-            performEndStateActions(sagaId, sagaInstance, false, true, sagaData);
+            performEndStateActions(sagaId, sagaInstance, true, true, sagaData);
             throw e;
         });
 
